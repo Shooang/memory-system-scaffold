@@ -1,10 +1,10 @@
-# memory-system-scaffold 一键安装脚本（Windows PowerShell）
+# memory-system-scaffold installer (Windows PowerShell)
 #
-# 用法：
-#   .\install.ps1                      # 交互式
-#   .\install.ps1 -Tool trae           # 直接指定工具
-#   .\install.ps1 -Tool cursor -Global # 全局安装
-#   .\install.ps1 -Help                # 查看帮助
+# Usage:
+#   .\install.ps1                      # interactive
+#   .\install.ps1 -Tool trae           # specify tool directly
+#   .\install.ps1 -Tool cursor -Global # global install
+#   .\install.ps1 -Help                # show help
 
 param(
   [string]$Tool,
@@ -13,27 +13,27 @@ param(
 )
 
 if ($Help) {
-  Write-Host "用法: .\install.ps1 [-Tool <tool>] [-Global]"
+  Write-Host "Usage: .\install.ps1 [-Tool <tool>] [-Global]"
   Write-Host ""
-  Write-Host "可选工具: trae, cursor, codex, claude-code, workbuddy"
-  Write-Host "默认模式: 项目级安装（-Global 切换为全局安装，仅 trae/cursor 支持）"
+  Write-Host "Available tools: trae, cursor, codex, claude-code, workbuddy"
+  Write-Host "Default mode: project-level install (-Global switches to global install, only trae/cursor supported)"
   Write-Host ""
-  Write-Host "示例:"
-  Write-Host "  .\install.ps1                       # 交互式"
-  Write-Host "  .\install.ps1 -Tool trae            # 安装到当前项目 TRAE"
-  Write-Host "  .\install.ps1 -Tool cursor -Global  # 全局安装到 Cursor"
+  Write-Host "Examples:"
+  Write-Host "  .\install.ps1                       # interactive"
+  Write-Host "  .\install.ps1 -Tool trae            # install to current project's TRAE"
+  Write-Host "  .\install.ps1 -Tool cursor -Global  # global install to Cursor"
   exit 0
 }
 
 $ErrorActionPreference = "Stop"
 
-# 脚本所在目录（即仓库根目录 = Skill 文件夹）
+# Script directory (repository root = Skill folder)
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 
-# 需要复制的 Skill 文件
+# Skill files to copy
 $SkillFiles = @("SKILL.md", "README.md")
 
-# 工具配置
+# Tool configuration
 $ToolConfig = @{
   "trae" = @{
     Name = "TRAE"
@@ -62,70 +62,70 @@ $ToolConfig = @{
   }
 }
 
-# 校验源文件存在
+# Verify source files exist
 foreach ($f in $SkillFiles) {
   $srcFile = Join-Path $ScriptDir $f
   if (-not (Test-Path $srcFile)) {
-    Write-Host "错误：找不到必需文件 $f（脚本应在仓库根目录运行）" -ForegroundColor Red
+    Write-Host "Error: required file $f not found (script should run from repo root)" -ForegroundColor Red
     exit 1
   }
 }
 
-# 交互式选择工具
+# Interactive tool selection
 if (-not $Tool) {
-  Write-Host "memory-system-scaffold 安装向导" -ForegroundColor Blue
+  Write-Host "memory-system-scaffold install wizard" -ForegroundColor Blue
   Write-Host ""
-  Write-Host "选择目标 AI 工作台："
-  Write-Host "  1) TRAE        （项目级 .\.trae\skills\，全局 ~/.trae-cn\builtin\global\skills\）"
-  Write-Host "  2) Cursor      （项目级 .\.cursor\skills\，全局 ~/.cursor\skills\）"
-  Write-Host "  3) Codex       （项目级 .\.codex\skills\）"
-  Write-Host "  4) Claude Code （项目根目录 .\）"
-  Write-Host "  5) WorkBuddy   （项目级 .\skills\）"
+  Write-Host "Select target AI workbench:"
+  Write-Host "  1) TRAE        (project: .\.trae\skills\, global: ~/.trae-cn\builtin\global\skills\)"
+  Write-Host "  2) Cursor      (project: .\.cursor\skills\, global: ~/.cursor\skills\)"
+  Write-Host "  3) Codex       (project: .\.codex\skills\)"
+  Write-Host "  4) Claude Code (project root: .\)"
+  Write-Host "  5) WorkBuddy   (project: .\skills\)"
   Write-Host ""
-  $choice = Read-Host "输入编号 [1-5]"
+  $choice = Read-Host "Enter number [1-5]"
   switch ($choice) {
     "1" { $Tool = "trae" }
     "2" { $Tool = "cursor" }
     "3" { $Tool = "codex" }
     "4" { $Tool = "claude-code" }
     "5" { $Tool = "workbuddy" }
-    default { Write-Host "无效选择" -ForegroundColor Red; exit 1 }
+    default { Write-Host "Invalid choice" -ForegroundColor Red; exit 1 }
   }
 
-  # 询问模式（仅支持全局的工具）
+  # Ask mode (only for tools that support global)
   if ($ToolConfig[$Tool].GlobalPath) {
     Write-Host ""
-    Write-Host "选择安装模式："
-    Write-Host "  1) 项目级（仅当前项目可用）"
-    Write-Host "  2) 全局（所有项目可用）"
-    $mode = Read-Host "输入编号 [1-2，默认 1]"
+    Write-Host "Select install mode:"
+    Write-Host "  1) Project-level (available only in current project)"
+    Write-Host "  2) Global (available in all projects)"
+    $mode = Read-Host "Enter number [1-2, default 1]"
     if ($mode -eq "2") {
       $Global = $true
     }
   }
 }
 
-# 校验工具
+# Validate tool
 if (-not $ToolConfig.ContainsKey($Tool)) {
-  Write-Host "未知工具: $Tool" -ForegroundColor Red
-  Write-Host "支持的工具: trae, cursor, codex, claude-code, workbuddy"
+  Write-Host "Unknown tool: $Tool" -ForegroundColor Red
+  Write-Host "Supported tools: trae, cursor, codex, claude-code, workbuddy"
   exit 1
 }
 
-# 确定目标路径
+# Determine target path
 if ($Global) {
   if (-not $ToolConfig[$Tool].GlobalPath) {
-    Write-Host "$($ToolConfig[$Tool].Name) 不支持全局安装" -ForegroundColor Red
+    Write-Host "$($ToolConfig[$Tool].Name) does not support global install" -ForegroundColor Red
     exit 1
   }
   $TargetDir = $ToolConfig[$Tool].GlobalPath
-  $ModeDesc = "全局"
+  $ModeDesc = "global"
 } else {
   $TargetDir = $ToolConfig[$Tool].ProjectPath
-  $ModeDesc = "项目级"
+  $ModeDesc = "project-level"
 }
 
-# 展开为绝对路径
+# Expand to absolute path
 if ($TargetDir -eq ".") {
   $TargetDir = (Get-Location).Path
 } else {
@@ -133,25 +133,25 @@ if ($TargetDir -eq ".") {
 }
 
 Write-Host ""
-Write-Host "安装信息" -ForegroundColor Blue
-Write-Host "  工具：$($ToolConfig[$Tool].Name)"
-Write-Host "  模式：$ModeDesc"
-Write-Host "  目标：$TargetDir"
+Write-Host "Install info" -ForegroundColor Blue
+Write-Host "  Tool: $($ToolConfig[$Tool].Name)"
+Write-Host "  Mode: $ModeDesc"
+Write-Host "  Target: $TargetDir"
 Write-Host ""
 
-# 确认
-$confirm = Read-Host "确认安装？[y/N]"
+# Confirm
+$confirm = Read-Host "Confirm install? [y/N]"
 if ($confirm -notmatch "^[yY]") {
-  Write-Host "已取消"
+  Write-Host "Cancelled"
   exit 0
 }
 
-# 创建目录（Claude Code 不需要创建）
+# Create directory (Claude Code doesn't need creation)
 if ($Tool -ne "claude-code") {
   New-Item -ItemType Directory -Force -Path $TargetDir | Out-Null
 }
 
-# 复制文件
+# Copy files
 foreach ($f in $SkillFiles) {
   $src = Join-Path $ScriptDir $f
   $dst = Join-Path $TargetDir $f
@@ -160,13 +160,13 @@ foreach ($f in $SkillFiles) {
 }
 
 Write-Host ""
-Write-Host "安装完成！" -ForegroundColor Green
+Write-Host "Install complete!" -ForegroundColor Green
 Write-Host ""
-Write-Host "下一步："
+Write-Host "Next steps:"
 if ($Tool -eq "claude-code") {
-  Write-Host "  在 Claude Code 中打开当前项目，说「搭建记忆系统」即可触发"
+  Write-Host "  Open current project in Claude Code, say 'set up memory system' to trigger"
 } else {
-  Write-Host "  打开 $($ToolConfig[$Tool].Name)，加载目标项目，说「搭建记忆系统」即可触发"
+  Write-Host "  Open $($ToolConfig[$Tool].Name), load target project, say 'set up memory system' to trigger"
 }
 Write-Host ""
-Write-Host "更多用法详见 README.md"
+Write-Host "See README.md for more usage."

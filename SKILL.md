@@ -6,908 +6,911 @@ version: "3.0.0"
 author: "custom"
 ---
 
-# 可复用分层记忆系统脚手架 v3.0（Knowledge OS）
+# Reusable Layered Memory System Scaffold v3.0 (Knowledge OS)
 
-基于 AI 工作台五层架构的工程实践，为任意项目自动生成白盒化的 Knowledge OS（知识操作系统）。AI 会先自动探测当前工作区，能推断的信息自动填充，无法推断的标记「待补充」。核心原则：**工具可替换，资产不可替换；目标锚定不漂移；真相唯一不矛盾；存储服务于召回；生命周期自治理；主动更新不等待。**
+> **Language**: English | [简体中文](./SKILL.zh-CN.md)
 
-## 核心理解（AI 必须先理解）
+Built on the engineering practice of the AI workbench five-layer architecture, this scaffold automatically generates a white-box Knowledge OS (Knowledge Operating System) for any project. The AI first auto-detects the current workspace, fills in information it can infer, and marks items it cannot infer as `[TBD]`. Core principles: **Tools are replaceable, assets are not; Goal anchoring without drift; Single source of truth without contradiction; Storage serves recall; Lifecycle self-governance; Proactive update without waiting.**
 
-记忆系统是项目的 Knowledge OS（知识操作系统），不是「存得越多越好」，而是让 AI 在一次任务中：
+## Core Understanding (AI must understand first)
 
-- **锚定目标**：始终对齐目标栈，不偏离主线
-- **防止漂移**：通过 Checkpoint 机制和主线保护保持注意力
-- **真相唯一**：通过 SoT（Source of Truth）层级解决矛盾，每个信息有权威等级
-- **生命周期管理**：记忆有状态（valid/pending/deprecated），会衰老、会冲突、会合并
-- **主动进化**：不等用户说「更新记忆」，里程碑后主动提议沉淀
-- **分级加载**：默认 L1 摘要→需要时 L2 片段→深度时 L3 全文，token 预算可控
-- **存储服务于召回**：让 AI 知道「什么时候读什么、读到什么颗粒度、矛盾时听谁的」
+The memory system is the project's Knowledge OS (Knowledge Operating System). It is not "the more stored, the better," but rather enables the AI within a single task to:
 
-## 触发条件
+- **Anchor goals**: Always align with the Goal Stack, never deviate from the main thread
+- **Prevent drift**: Maintain attention through the Checkpoint mechanism and main-thread protection
+- **Single source of truth**: Resolve contradictions through the SoT (Source of Truth) hierarchy; every piece of information has an authority level
+- **Lifecycle management**: Memory has states (valid/pending/deprecated); it ages, conflicts, and merges
+- **Proactive evolution**: No need to wait for the user to say "update memory"; proactively propose consolidation after milestones
+- **Tiered loading**: Default L1 summary → L2 fragments when needed → L3 full text for depth, with controllable token budget
+- **Storage serves recall**: Lets the AI know "when to read what, at what granularity, and who to obey when there are contradictions"
 
-- 用户说「搭建记忆系统」「创建记忆文件」「初始化记忆系统」「setup memory system」
-- 新项目/空目录缺少 `memory.md` 或 `agent.md`
-- 用户明确要求为当前项目建立上下文锚点
-- 用户说「优化记忆」「重构记忆」「整理记忆」「升级记忆系统」
+## Trigger Conditions
 
-## 前置检查（AI 必须先执行）
+- User says "搭建记忆系统" ("set up memory system"), "创建记忆文件" ("create memory file"), "初始化记忆系统" ("initialize memory system"), or "setup memory system"
+- New project / empty directory lacking `memory.md` or `agent.md`
+- User explicitly requests context anchoring for the current project
+- User says "优化记忆" ("optimize memory"), "重构记忆" ("refactor memory"), "整理记忆" ("organize memory"), or "升级记忆系统" ("upgrade memory system")
 
-1. 确认当前打开的项目文件夹路径
-2. 检测是否已有 `memory.md` 或 `agent.md`，若有则询问用户是覆盖重建还是增量升级
-3. 确认当前为新会话或已告知 AI「开始新项目，忽略之前记忆」
-4. 询问用户要搭建哪一层记忆（通过 AskUserQuestion）：
-   - **仅项目级记忆**（推荐）：只为当前项目创建记忆系统
-   - **用户级 + 项目级**：同时创建跨项目通用的用户级记忆（agent.md + preferences.md + knowledge.md + lessons-learned.md）
-   - **仅用户级记忆**：只创建全局用户档案
-5. 执行项目信息自动探测
+## Pre-checks (AI must perform first)
 
-## 记忆系统 Knowledge OS 五层架构
+1. Confirm the currently open project folder path
+2. Detect whether `memory.md` or `agent.md` already exists; if so, ask the user whether to overwrite and rebuild or perform an incremental upgrade
+3. Confirm this is a new session or the user has told the AI "starting a new project, ignore previous memory"
+4. Ask the user which layer of memory to set up (via AskUserQuestion):
+   - **Project-level memory only** (recommended): Create a memory system only for the current project
+   - **User-level + Project-level**: Also create cross-project universal user-level memory (agent.md + preferences.md + knowledge.md + lessons-learned.md)
+   - **User-level memory only**: Only create the global user profile
+5. Perform automatic project information detection
+
+## Memory System Knowledge OS Five-Layer Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│ 运行时治理层（Runtime Governance）                               │
-│   目标栈锚定 · Checkpoint 漂移防护 · 自动更新触发                │
-│   冲突检测 · SoT 仲裁 · 三级加载调度                             │
+│ Runtime Governance Layer                                         │
+│   Goal stack anchoring · Checkpoint drift protection · Auto-update triggers │
+│   Conflict detection · SoT arbitration · Three-level loading scheduling │
 ├─────────────────────────────────────────────────────────────────┤
-│ 第一层：会话级记忆（自动）                                       │
-│   单次对话上下文 + checkpoint 状态，由智能体自动管理              │
+│ Layer 1: Session-level Memory (automatic)                       │
+│   Single conversation context + checkpoint state,               │
+│   managed automatically by the agent                            │
 ├─────────────────────────────────────────────────────────────────┤
-│ 第二层：用户级长期记忆（可选，跨项目通用）                        │
-│   <用户记忆根目录>/                                              │
-│   ├── agent.md              ← 全局规则/人设/偏好                 │
-│   ├── preferences.md        ← 输出偏好、语言、风格、交互习惯      │
-│   ├── knowledge.md          ← 跨项目领域知识、思维模型           │
-│   └── lessons-learned.md    ← 通用经验教训、反模式               │
+│ Layer 2: User-level Long-term Memory (optional, cross-project)  │
+│   <user memory root>/                                            │
+│   ├── agent.md              ← Global rules/persona/preferences   │
+│   ├── preferences.md        ← Output preferences, language, style, interaction habits │
+│   ├── knowledge.md          ← Cross-project domain knowledge, mental models │
+│   └── lessons-learned.md    ← General lessons learned, anti-patterns │
 ├─────────────────────────────────────────────────────────────────┤
-│ 第三层：项目级长期记忆（必建） — 带 SoT 权威层级                  │
-│   <项目根目录>/                                                  │
-│   ├── agent.md              ← 项目全局规则（含目标对齐/检查点/自动更新规则）│
-│   ├── memory.md             ← 记忆索引+导航地图+目标栈（核心入口）│
-│   ├── memory/               ← 具体记忆文件（每个含元数据头+TL;DR）│
-│   │   └── log.md            ← 工作日志                           │
-│   └── context/              ← 结构化知识库（子目录分类+元数据）   │
-│       ├── README.md         ← 语料总索引（AI 自动维护）          │
-│       ├── research/         ← [按需创建] 研究/调研              │
-│       ├── meetings/         ← [按需创建] 会议纪要               │
-│       ├── prd/              ← [按需创建] 需求文档               │
-│       ├── courses/          ← [按需创建] 课程/学习              │
-│       └── reference/        ← [按需创建] 参考文档               │
+│ Layer 3: Project-level Long-term Memory (required) — with SoT authority hierarchy │
+│   <project root>/                                                │
+│   ├── agent.md              ← Project global rules (incl. goal alignment/checkpoints/auto-update rules) │
+│   ├── memory.md             ← Memory index + navigation map + goal stack (core entry) │
+│   ├── memory/               ← Specific memory files (each with metadata header + TL;DR) │
+│   │   └── log.md            ← Work log                              │
+│   └── context/              ← Structured knowledge base (subdirectory categories + metadata) │
+│       ├── README.md         ← Corpus master index (AI auto-maintained) │
+│       ├── research/         ← [create as needed] Research/survey     │
+│       ├── meetings/         ← [create as needed] Meeting minutes     │
+│       ├── prd/              ← [create as needed] Requirements docs   │
+│       ├── courses/          ← [create as needed] Courses/learning    │
+│       └── reference/        ← [create as needed] Reference docs      │
 ├─────────────────────────────────────────────────────────────────┤
-│ 第四层：工作日志（灵活）                                         │
-│   memory/log.md（推荐）或 memory/daily/ 或 memory/monthly/      │
-│   按用户习惯选择，不强制每日一文件                                │
+│ Layer 4: Work Log (flexible)                                    │
+│   memory/log.md (recommended) or memory/daily/ or memory/monthly/ │
+│   Choose by user preference; one file per day is not enforced    │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-## 步骤 1：项目信息自动探测
+## Step 1: Automatic Project Information Detection
 
-AI 先扫描当前工作区，按优先级填充项目信息，绝不编造：
+The AI first scans the current workspace and fills in project information by priority, never fabricating:
 
-| 信息项 | 探测来源 | 可信度判定 |
+| Information Item | Detection Source | Confidence Assessment |
 |--------|---------|-----------|
-| **项目名称** | ① 根目录文件夹名（去掉 `_YYYYMMDDHHmmss` 时间戳后缀）② `package.json`/`pyproject.toml` 的 `name` ③ `README.md` 首行标题 | 配置文件=高；文件夹名=中；推断=低 |
-| **项目类型** | ① 根目录配置文件（`package.json`→Web/Node，`requirements.txt`→Python，`*.md` 为主→内容创作/知识管理，代码文件为主→软件产品）② 文件结构 | 明确技术栈=高；扩展名推断=中；无法判断=其他 |
-| **一句话定位** | ① `README.md` 第一段 ② 配置文件 `description` | 直接引用=高；概括=中；无法提炼=待补充 |
-| **长期愿景** | ① README 中「愿景」「Vision」「Mission」段落 ② 项目描述推断 | 直接引用=高；概括=中；无法提炼=待补充 |
-| **核心目标** | ① README 中「目标」「Purpose」段落 ② 项目描述概括 | 直接引用=高；概括=中；无法提炼=待补充 |
-| **当前阶段** | ① CHANGELOG/版本历史 ② TODO/ROADMAP 文件 ③ README 中「当前状态」 | 明确记录=高；推断=中；无法判断=待补充 |
-| **目标用户/受众** | ① README 相关段落 ② 推断 | 直接引用=高；推断=中；无法判断=待补充 |
-| **技术栈** | ① 配置文件依赖 ② 代码扩展名 ③ README 技术栈章节 | 明确依赖=高；扩展名=中；非软件=不适用 |
-| **关键约束** | ① README/CONTRIBUTING/规范文件 ② 项目结构推断 | 明确写明=高；初始=待补充 |
-| **存量资料情况** | 扫描根目录下是否有大量现有文档（docs/、articles/、参考资料/ 等）| 用于判断是否需要初始化指引 |
+| **Project name** | ① Root folder name (strip `_YYYYMMDDHHmmss` timestamp suffix) ② `name` from `package.json`/`pyproject.toml` ③ First-line title of `README.md` | Config file = high; folder name = medium; inference = low |
+| **Project type** | ① Root config files (`package.json`→Web/Node, `requirements.txt`→Python, mostly `*.md`→content creation/knowledge management, mostly code files→software product) ② File structure | Explicit tech stack = high; extension inference = medium; undeterminable = other |
+| **One-line positioning** | ① First paragraph of `README.md` ② `description` from config file | Direct quote = high; summary = medium; undeterminable = `[TBD]` |
+| **Long-term vision** | ① "Vision"/"Mission" sections in README ② Inferred from project description | Direct quote = high; summary = medium; undeterminable = `[TBD]` |
+| **Core goal** | ① "Purpose"/"Goal" sections in README ② Summary from project description | Direct quote = high; summary = medium; undeterminable = `[TBD]` |
+| **Current phase** | ① CHANGELOG/version history ② TODO/ROADMAP files ③ "Current Status" in README | Explicit record = high; inference = medium; undeterminable = `[TBD]` |
+| **Target users/audience** | ① Relevant sections in README ② Inference | Direct quote = high; inference = medium; undeterminable = `[TBD]` |
+| **Tech stack** | ① Config file dependencies ② Code extensions ③ README tech stack section | Explicit dependencies = high; extensions = medium; non-software = N/A |
+| **Key constraints** | ① README/CONTRIBUTING/spec files ② Project structure inference | Explicitly stated = high; initial = `[TBD]` |
+| **Existing materials** | Scan root directory for large amounts of existing docs (docs/, articles/, reference materials/, etc.) | Used to determine whether initialization guidance is needed |
 
-**探测规则：**
-- 能推断则填，不能推断标记「待补充」
-- 空目录只创建骨架
-- 探测完成后输出结果表格（值、来源、可信度），**不等待用户回复，继续创建**
+**Detection rules:**
+- Fill in when inferrable; mark as `[TBD]` when not
+- For empty directories, only create the skeleton
+- After detection, output a results table (value, source, confidence); **do not wait for user reply, continue creating**
 
-## 步骤 2：创建目录结构
+## Step 2: Create Directory Structure
 
-### 2.1 项目级记忆（必建）
-
-```
-<项目根目录>/
-├── agent.md                     ← 项目全局规则文件（含目标对齐/检查点/自动更新规则）
-├── memory.md                    ← 记忆索引 + 导航地图 + 目标栈 + SoT层级（核心入口）
-├── memory/                      ← 具体记忆文件（每个含元数据头+TL;DR）
-│   └── log.md                   ← 工作日志（或 daily/ monthly/，见步骤3.5）
-└── context/                     ← 结构化知识库目录
-    └── README.md                ← 语料总索引（AI 自动维护）
-```
-
-注意：`context/` 下的 5 个子目录（research/ meetings/ prd/ courses/ reference/）按需创建，初始只建 `context/README.md`，首次放入对应类型资料时再创建子目录。
-
-### 2.2 用户级记忆（如用户选择）
+### 2.1 Project-level Memory (required)
 
 ```
-<用户记忆根目录>/
-├── agent.md                     ← 全局规则/人设（跨项目通用）
-├── preferences.md               ← 输出偏好、语言、风格、交互习惯
-├── knowledge.md                 ← 跨项目领域知识、思维模型
-└── lessons-learned.md           ← 通用经验教训、反模式
+<project root>/
+├── agent.md                     ← Project global rules file (incl. goal alignment/checkpoints/auto-update rules)
+├── memory.md                    ← Memory index + navigation map + goal stack + SoT hierarchy (core entry)
+├── memory/                      ← Specific memory files (each with metadata header + TL;DR)
+│   └── log.md                   ← Work log (or daily/ monthly/, see Step 3.5)
+└── context/                     ← Structured knowledge base directory
+    └── README.md                ← Corpus master index (AI auto-maintained)
 ```
 
-**关键：memory/ 下的具体文件分类不要硬编码。** AI 根据项目类型自动决定文件划分，参考框架见步骤 3.3。
+Note: The 5 subdirectories under `context/` (research/ meetings/ prd/ courses/ reference/) are created as needed. Initially only create `context/README.md`; create subdirectories when first placing corresponding materials.
 
-## 步骤 3：逐个创建文件
+### 2.2 User-level Memory (if user selects)
 
-### 3.1 `agent.md`（全局规则文件）
+```
+<user memory root>/
+├── agent.md                     ← Global rules/persona (cross-project universal)
+├── preferences.md               ← Output preferences, language, style, interaction habits
+├── knowledge.md                 ← Cross-project domain knowledge, mental models
+└── lessons-learned.md           ← General lessons learned, anti-patterns
+```
 
-这是和 `memory.md` 同等重要的文件。用户每次发消息，智能体会同时把 `agent.md` 和 `memory.md` 作为上下文注入给大模型。
+**Key: The classification of specific files under memory/ must not be hardcoded.** The AI automatically determines file partitioning based on project type; see Step 3.3 for the reference framework.
 
-`agent.md` 必须包含以下六大区块：
+## Step 3: Create Files One by One
+
+### 3.1 `agent.md` (Global Rules File)
+
+This file is as important as `memory.md`. Every time the user sends a message, the agent injects both `agent.md` and `memory.md` as context into the large model.
+
+`agent.md` must contain the following six sections:
 
 ```markdown
-# Agent 全局规则
+# Agent Global Rules
 
-## 角色
-你是 [项目名称] 的 AI 助手。[一句话定位角色]。
+## Role
+You are the AI assistant for [project name]. [One-line role positioning].
 
-## 目标对齐规则（每次回复前必检）
-1. 每次收到实质性任务请求时，先对照 `memory.md` 中的「目标栈」检查对齐度
-2. 对齐度判断：
-   - **对齐**（直接推进当前任务）→ 正常执行
-   - **弱偏离**（服务于阶段目标但非当前任务）→ 执行前提醒：「这与当前任务[X]不同，但属于阶段目标[Y]范围，是否继续？」
-   - **强偏离**（与阶段目标无关/违反硬约束）→ 暂停，提示：「这看起来与当前阶段目标[X]不一致，是否要：(a) 切换到新目标 (b) 先记为待办继续当前任务 (c) 取消」
-3. 目标栈更新需要用户明确确认（「更新目标」「这个阶段完成了」「进入下一阶段」等），AI 不得自行修改
-4. 弱偏离但有用的请求记入「待办侧线」（在 Checkpoint 中列出），主线任务完成后提醒用户
+## Goal Alignment Rules (must check before each reply)
+1. Each time you receive a substantive task request, first check alignment against the "Goal Stack" in `memory.md`
+2. Alignment assessment:
+   - **Aligned** (directly advances current task) → execute normally
+   - **Weak deviation** (serves phase goal but not current task) → before executing, remind: "This differs from current task [X], but falls within phase goal [Y]. Continue?"
+   - **Strong deviation** (unrelated to phase goal / violates hard constraints) → pause and prompt: "This appears inconsistent with current phase goal [X]. Do you want to: (a) switch to a new goal (b) note it as a todo and continue current task (c) cancel"
+3. Goal stack updates require explicit user confirmation ("update goal", "this phase is done", "move to next phase", etc.); AI must not modify on its own
+4. Weak deviations that are still useful should be recorded in "todo side-track" (listed in Checkpoint); after the main task is complete, remind the user
 
-## Checkpoint 与注意力防护规则
-1. **Checkpoint 触发时机**：
-   - 每完成 3 个实质性步骤（文件创建/内容生成/分析完成等）
-   - 对话轮次超过 10 轮
-   - 从一个子任务切换到另一个子任务
-   - 用户表达困惑或重复提问
-   - AI 检测到自身上下文质量下降（重复自己/遗漏关键信息）
-2. **Checkpoint 格式**：
+## Checkpoint and Attention Protection Rules
+1. **Checkpoint trigger timing**:
+   - Every 3 substantive steps completed (file creation/content generation/analysis complete, etc.)
+   - Conversation rounds exceed 10
+   - Switching from one subtask to another
+   - User expresses confusion or repeats questions
+   - AI detects degradation of its own context quality (repeating itself/omitting key information)
+2. **Checkpoint format**:
    ```
    [Checkpoint]
-   - 当前目标：[从目标栈取当前任务]
-   - 已完成：[简要进度]
-   - 进行中：[当前正在做什么]
-   - 约束：[激活的硬约束/注意事项]
-   - 待办侧线：[记录的非主线任务，无则写"无"]
-   - 下一步：[接下来要做什么]
+   - Current goal: [take current task from goal stack]
+   - Completed: [brief progress]
+   - In progress: [what is currently being done]
+   - Constraints: [active hard constraints/notes]
+   - Todo side-track: [recorded non-main-thread tasks, or "none"]
+   - Next step: [what to do next]
    ```
-3. **主线保护**：
-   - 用户执行过程中插入新需求：紧急且快速（1分钟内可完成）→ 立即处理后回来；不紧急 → 记入待办侧线继续主线
-   - 用户说「先做X」→ 切换主线，将旧主线记入待办侧线
-4. **上下文重建**：
-   - 检测信号：AI 开始重复自己、遗漏之前讨论过的关键信息、用户连续纠正 2 次以上、回复变得泛泛而谈
-   - 建议语：「当前会话上下文可能已饱和，建议开新会话。我将生成交接摘要供新会话使用。」
-   - 交接摘要格式：**当前目标** + **已完成** + **进行中** + **待办侧线** + **关键约束** + **需要加载的记忆文件列表**
-5. 新会话交接时，AI 自动生成上述交接摘要供用户粘贴到新会话
+3. **Main-thread protection**:
+   - User inserts a new request during execution: urgent and quick (completable within 1 minute) → handle immediately and return; not urgent → record in todo side-track and continue main thread
+   - User says "do X first" → switch main thread, record old main thread in todo side-track
+4. **Context reconstruction**:
+   - Detection signals: AI starts repeating itself, omits previously discussed key information, user corrects 2+ times in a row, replies become generic
+   - Suggested phrasing: "Current session context may be saturated. Suggest opening a new session. I will generate a handover summary for the new session."
+   - Handover summary format: **Current goal** + **Completed** + **In progress** + **Todo side-track** + **Key constraints** + **List of memory files to load**
+5. When handing over to a new session, AI automatically generates the above handover summary for the user to paste into the new session
 
-## 自动更新规则（无需等待"更新记忆"）
-1. **里程碑后主动提议**（等待一轮无异议则自动执行）：
-   - 触发时机：完成一个里程碑（任务完成/决策做出/文件交付/重要分析结束）
-   - 输出格式：`[记忆更新提议] 我准备将 [简要内容] 记录到 [目标文件]。原因：[为什么值得记]。如无异议将自动记录。`
-   - 执行：下一轮用户未反对 → 写入；用户反对 → 不写入或调整内容
-2. **即时自动记录**（不等提议，直接写入）：
-   - AI 犯错被用户纠正 → 立即写入经验教训（pending 状态，注明触发条件）
-   - AI 在多个方案中做出选择 → 写入决策日志（pending 状态，注明替代方案）
-   - 发现新的硬约束/规则 → 写入对应文件（pending 状态，标记待确认）
-3. **索引即时维护**：当 memory/ 或 context/ 下新增文件时，立即更新 `memory.md` 中的索引表和 `context/README.md`
-4. **不自动记录的情况**：纯讨论/闲聊、用户明确说「不用记」、临时信息（如「帮我查一下天气」）
-5. **更新范围控制**：每次自动更新只追加条目，不修改/删除已有条目（除非用户明确要求）；自动更新内容默认 pending 状态
+## Auto-Update Rules (no need to wait for "update memory")
+1. **Proactive proposal after milestones** (auto-execute after one round without objection):
+   - Trigger: completing a milestone (task complete/decision made/file delivered/important analysis finished)
+   - Output format: `[Memory Update Proposal] I plan to record [brief content] in [target file]. Reason: [why it's worth recording]. Will record automatically if no objection.`
+   - Execution: user does not object in next round → write; user objects → do not write or adjust content
+2. **Instant auto-recording** (write directly without waiting for proposal):
+   - AI makes a mistake and is corrected by user → immediately write to lessons learned (pending state, note trigger condition)
+   - AI chooses among multiple options → write to decision log (pending state, note alternatives)
+   - New hard constraint/rule discovered → write to corresponding file (pending state, mark for confirmation)
+3. **Index real-time maintenance**: When new files are added under memory/ or context/, immediately update the index table in `memory.md` and `context/README.md`
+4. **Cases not auto-recorded**: pure discussion/chitchat, user explicitly says "don't record", temporary information (e.g., "check the weather for me")
+5. **Update scope control**: Each auto-update only appends entries; it does not modify/delete existing entries (unless user explicitly requests); auto-updated content defaults to pending state
 
-## 全局规则
-1. 每次对话开始先读 `memory.md`（L3 全文，因为它是索引），根据任务类型从「任务类型→召回预设」表确定需要加载的文件
-2. 加载遵循 L1→L2→L3 三级升级规则（详见 `memory.md`「三级加载规则」）
-3. 信息冲突时，严格按照 SoT 权威层级仲裁（详见 `memory.md`「真相源层级」）
-4. 存储服务于召回：记忆文件要精简、结构化，方便下次快速定位
-5. 不确定的信息标记「待补充」或设为 pending 状态，不编造
-6. [其他项目特有的规则，由 AI 根据项目探测结果填充]
+## Global Rules
+1. At the start of each conversation, first read `memory.md` (L3 full text, because it is the index); based on task type, determine which files to load from the "Task type → recall preset" table
+2. Loading follows the L1→L2→L3 three-level escalation rules (see "Three-level Loading Rules" in `memory.md`)
+3. On information conflict, strictly arbitrate according to the SoT authority hierarchy (see "Source of Truth Hierarchy" in `memory.md`)
+4. Storage serves recall: memory files should be concise and structured for quick positioning next time
+5. Uncertain information should be marked as `[TBD]` or set to pending state; do not fabricate
+6. [Other project-specific rules, filled by AI based on project detection results]
 
-## 硬约束
-- [待补充：根据项目探测结果填充初始约束]
+## Hard Constraints
+- [TBD: fill in initial constraints based on project detection results]
 
-## 记忆召回规则（导航地图使用说明）
-- 导航地图、召回预设、三级加载规则在 `memory.md` 中定义
-- 每次任务开始 → 读 `memory.md`（L3 全文）
-- 根据「任务类型→召回预设」表确定初始加载文件集
-- 按 L1（TL;DR）→ L2（相关章节）→ L3（全文）逐级加载
-- 信息不足时按 SoT 降级路由链检索：L0→L1→L2→L3→L4→L5→L6→询问用户
+## Memory Recall Rules (Navigation Map Usage Instructions)
+- The navigation map, recall presets, and three-level loading rules are defined in `memory.md`
+- At the start of each task → read `memory.md` (L3 full text)
+- Determine the initial file set to load from the "Task type → recall preset" table
+- Load progressively by L1 (TL;DR) → L2 (relevant sections) → L3 (full text)
+- When information is insufficient, search via the SoT downgrade routing chain: L0→L1→L2→L3→L4→L5→L6→ask user
 ```
 
-### 3.2 `memory.md`（记忆索引 + Knowledge OS 核心入口）
+### 3.2 `memory.md` (Memory Index + Knowledge OS Core Entry)
 
-这是记忆系统的核心入口，**必须包含导航/召回逻辑和运行时治理数据**，不能只是文件列表。
+This is the core entry of the memory system. **It must contain navigation/recall logic and runtime governance data**, not just a file list.
 
 ```markdown
-# [项目名称] · 记忆索引（Memory Index）
+# [project name] · Memory Index
 
-> **TL;DR**: 本文件是项目 Knowledge OS 的核心入口。AI 每次对话开始必须读取全文（本文件不长，L3 加载）。
-> 包含：目标栈、SoT 权威层级、导航地图、召回预设、三级加载规则、记忆文件索引、生命周期状态。
+> **TL;DR**: This file is the core entry of the project's Knowledge OS. AI must read the full text at the start of every conversation (this file is not long, L3 load).
+> Contains: goal stack, SoT authority hierarchy, navigation map, recall presets, three-level loading rules, memory file index, lifecycle state.
 
 ---
 
-## 元数据
+## Metadata
 
-| 属性 | 值 |
+| Property | Value |
 |------|-----|
-| 最后更新 | YYYY-MM-DD |
-| 记忆系统版本 | v3.0（Knowledge OS） |
-| 权威等级 | L1（项目背景/索引层） |
-| 范围 | 项目全局 |
+| Last updated | YYYY-MM-DD |
+| Memory system version | v3.0 (Knowledge OS) |
+| Authority level | L1 (project background/index layer) |
+| Scope | Project global |
 
-## 项目概况
+## Project Overview
 
-| 项目 | 信息 |
+| Project | Information |
 |------|------|
-| 项目名称 | [探测值] |
-| 项目类型 | [探测值] |
-| 一句话定位 | [探测值 / 待补充] |
-| 当前版本 | v1.0 |
+| Project name | [detected value] |
+| Project type | [detected value] |
+| One-line positioning | [detected value / TBD] |
+| Current version | v1.0 |
 
-## 目标栈（Goal Stack）
+## Goal Stack
 
-**AI 每次回复前必须检查当前任务是否对齐目标栈。偏离时必须指出并确认。**
+**AI must check whether the current task aligns with the goal stack before each reply. When deviating, must point out and confirm.**
 
-| 层级 | 目标 | 状态 | 更新日期 |
+| Level | Goal | Status | Updated date |
 |------|------|------|---------|
-| 长期愿景（North Star） | [项目最终想达成什么 / 待补充] | valid | YYYY-MM-DD |
-| 季度目标（Quarterly） | [当前季度的核心目标 / 待补充] | valid | YYYY-MM-DD |
-| 阶段目标（Phase） | [当前里程碑目标 / 待补充] | valid | YYYY-MM-DD |
-| 当前任务（Current Task） | [正在做什么 / 待补充] | valid | YYYY-MM-DD |
+| Long-term vision (North Star) | [what the project ultimately wants to achieve / TBD] | valid | YYYY-MM-DD |
+| Quarterly goal | [core goal for the current quarter / TBD] | valid | YYYY-MM-DD |
+| Phase goal | [current milestone goal / TBD] | valid | YYYY-MM-DD |
+| Current task | [what is being done / TBD] | valid | YYYY-MM-DD |
 
-**目标栈使用规则：**
-- 回复前检查：当前请求是否在推进「当前任务」？
-- 偏离处理：偏离「当前任务」但服务于「阶段目标」→ 黄色提醒；偏离「阶段目标」→ 红色警告需确认
-- 更新规则：长期愿景极少变动；季度目标在季度初设定；阶段目标在里程碑完成后更新；当前任务随工作进展实时更新
-- 目标更新需要用户明确确认，AI 不得自行修改目标栈
+**Goal stack usage rules:**
+- Pre-reply check: Is the current request advancing the "Current task"?
+- Deviation handling: Deviating from "Current task" but serving "Phase goal" → yellow reminder; deviating from "Phase goal" → red warning requiring confirmation
+- Update rules: Long-term vision rarely changes; quarterly goals set at the start of the quarter; phase goals updated after milestone completion; current task updated in real time as work progresses
+- Goal updates require explicit user confirmation; AI must not modify the goal stack on its own
 
-## 真相源层级（Source of Truth Hierarchy）
+## Source of Truth Hierarchy
 
-**当不同记忆文件中的信息冲突时，按以下权威等级从高到低仲裁。高等级覆盖低等级。**
+**When information in different memory files conflicts, arbitrate by the following authority levels from highest to lowest. Higher levels override lower levels.**
 
-| 等级 | 权威源 | 说明 | 对应文件 |
+| Level | Authority source | Description | Corresponding file |
 |------|--------|------|---------|
-| L0 | 硬约束 | 不可违反的红线，最高权威 | `memory/02_hard_constraints.md` |
-| L1 | 项目背景与目标 | 愿景、定位、目标用户、核心目标、目标栈 | `memory/01_project_background.md` + 本文件目标栈 |
-| L2 | 决策日志 | 已确认的决策及原因，高于经验 | `memory/06_decisions_log.md` |
-| L3 | 经验教训 | 踩坑记录、最佳实践 | `memory/07_lessons_learned.md` |
-| L4 | 工作流/规范 | 流程、命名、格式、平台策略 | `memory/03_workflow_rules.md`, `memory/04_*.md`, `memory/05_*.md` |
-| L5 | 日志/版本历史 | 时间序列记录，仅供参考 | `memory/08_version_history.md`, `memory/log.md` |
-| L6 | 上下文语料 | 原始参考资料，最低权威 | `context/` 下所有文件 |
+| L0 | Hard constraints | Red lines that cannot be violated; highest authority | `memory/02_hard_constraints.md` |
+| L1 | Project background and goals | Vision, positioning, target users, core goals, goal stack | `memory/01_project_background.md` + this file's goal stack |
+| L2 | Decision log | Confirmed decisions and reasons; higher than experience | `memory/06_decisions_log.md` |
+| L3 | Lessons learned | Pitfall records, best practices | `memory/07_lessons_learned.md` |
+| L4 | Workflows/specs | Processes, naming, formats, platform strategies | `memory/03_workflow_rules.md`, `memory/04_*.md`, `memory/05_*.md` |
+| L5 | Logs/version history | Time-series records, for reference only | `memory/08_version_history.md`, `memory/log.md` |
+| L6 | Context corpus | Original reference materials; lowest authority | all files under `context/` |
 
-**仲裁规则：**
-1. 高等级 valid 信息始终覆盖低等级 valid 信息
-2. 同等级 valid 信息冲突 → 以 last_updated 较新的为准（查看元数据）
-3. 同等级同日期 → 标记冲突，询问用户裁决
-4. pending 状态的信息不覆盖 valid 信息（只参考，不作为权威依据）
-5. deprecated 状态的信息不参与仲裁
-6. 用户级记忆不参与项目级 SoT 仲裁（项目规则优先于个人偏好）
+**Arbitration rules:**
+1. Higher-level valid information always overrides lower-level valid information
+2. Same-level valid information conflict → the one with the more recent last_updated prevails (check metadata)
+3. Same level and same date → mark conflict, ask user to arbitrate
+4. Pending information does not override valid information (reference only, not as authoritative basis)
+5. Deprecated information does not participate in arbitration
+6. User-level memory does not participate in project-level SoT arbitration (project rules take precedence over personal preferences)
 
-## 导航地图（增强版）
+## Navigation Map (Enhanced)
 
-| 优先级 | 场景/触发条件 | 读取文件 | 加载级别 | 召回预设标签 |
+| Priority | Scenario/Trigger | File to read | Load level | Recall preset tag |
 |--------|--------------|---------|---------|-------------|
-| P0 | 每次任务开始（必读） | `memory.md`（本文件） | L3（全文） | all |
-| P0 | 内容生成/写代码/写文档前 | 硬约束文件 | L2（相关章节） | create |
-| P1 | 了解项目是什么/为谁做/为什么 | 项目背景文件 | L2（核心章节） | understand |
-| P1 | 做决策/修改既有方案 | 决策日志 | L2（相关条目） | decide |
-| P1 | 避免重复犯错/执行前检查 | 经验教训文件 | L2（相关条目） | execute |
-| P2 | 涉及工作流/流程/触发词 | 工作流规则文件 | L2（相关章节） | create |
-| P2 | 创建文件/命名/格式 | 工程规范文件 | L2（相关章节） | create |
-| P2 | 平台相关任务 | 平台策略文件 | L2（相关章节） | distribute |
-| P2 | 了解版本演进/历史 | 版本历史 | L1（最新条目） | understand |
-| P3 | 查阅参考资料/书籍/文档 | `context/README.md` → 语料文件 | L1→按需L2/L3 | research |
-| P3 | 回顾近期工作 | 日志文件 | L1（近期条目） | review |
+| P0 | At the start of every task (must read) | `memory.md` (this file) | L3 (full text) | all |
+| P0 | Before content generation/code writing/doc writing | Hard constraints file | L2 (relevant sections) | create |
+| P1 | Understanding what the project is/who it's for/why | Project background file | L2 (core sections) | understand |
+| P1 | Making decisions/modifying existing plans | Decision log | L2 (relevant entries) | decide |
+| P1 | Avoiding repeated mistakes/pre-execution check | Lessons learned file | L2 (relevant entries) | execute |
+| P2 | Involving workflows/processes/triggers | Workflow rules file | L2 (relevant sections) | create |
+| P2 | Creating files/naming/formatting | Engineering specs file | L2 (relevant sections) | create |
+| P2 | Platform-related tasks | Platform strategy file | L2 (relevant sections) | distribute |
+| P2 | Understanding version evolution/history | Version history | L1 (latest entries) | understand |
+| P3 | Consulting reference materials/books/docs | `context/README.md` → corpus file | L1→on-demand L2/L3 | research |
+| P3 | Reviewing recent work | Log file | L1 (recent entries) | review |
 
-**召回铁律：**
-1. 不是所有文件每次都读，按优先级和召回预设按需加载
-2. 默认 L1（TL;DR），根据需要升级到 L2/L3
-3. 遇到新类型问题时，先扫描全部记忆文件的 TL;DR，再决定深入读哪个
-4. 信息不足时按 SoT 降级路由：L0→L1→L2→L3→L4→L5→L6→询问用户
+**Recall iron rules:**
+1. Not all files are read every time; load on demand by priority and recall preset
+2. Default L1 (TL;DR), upgrade to L2/L3 as needed
+3. When encountering a new type of problem, first scan the TL;DR of all memory files, then decide which to read in depth
+4. When information is insufficient, downgrade via SoT routing: L0→L1→L2→L3→L4→L5→L6→ask user
 
-## 任务类型→召回预设
+## Task Type → Recall Preset
 
-| 任务类型 | 初始加载文件（L1） | 升级触发条件 |
+| Task type | Initial files to load (L1) | Escalation trigger |
 |---------|-------------------|-------------|
-| 内容创作（写文章/视频/代码） | 硬约束 + 项目背景 + 工作流规范 + 相关经验教训 | 遇到决策点→L2决策日志；需要参考→L2/L3语料 |
-| 决策（选方案/改方向） | 硬约束 + 项目背景 + 相关决策日志 + 相关经验教训 | 需要具体数据→L3语料 |
-| 排错/修复（debug/返工） | 硬约束 + 相关经验教训 + 相关决策日志 | 问题复杂→L3相关文件全文 |
-| 研究/学习（调研/阅读） | context/ 相关语料索引 + 项目背景 | 深入阅读→L2/L3语料全文 |
-| 规划（计划/路线图） | 目标栈 + 项目背景 + 决策日志 + 经验教训 | 需要约束细节→L2硬约束/规范 |
-| 日常交流（问答/讨论） | 目标栈 + 项目背景（均L1） | 需要具体信息→L2对应文件 |
+| Content creation (writing articles/videos/code) | Hard constraints + project background + workflow specs + relevant lessons learned | At decision point → L2 decision log; need reference → L2/L3 corpus |
+| Decision (choosing options/changing direction) | Hard constraints + project background + relevant decision log + relevant lessons learned | Need specific data → L3 corpus |
+| Debugging/fixing (debug/rework) | Hard constraints + relevant lessons learned + relevant decision log | Complex problem → L3 full text of relevant files |
+| Research/learning (survey/reading) | context/ relevant corpus index + project background | Deep reading → L2/L3 corpus full text |
+| Planning (plans/roadmaps) | Goal stack + project background + decision log + lessons learned | Need constraint details → L2 hard constraints/specs |
+| Daily communication (Q&A/discussion) | Goal stack + project background (all L1) | Need specific info → L2 corresponding file |
 
-## 三级加载规则
+## Three-Level Loading Rules
 
-| 级别 | 内容 | Token 预算（参考） | 触发条件 |
+| Level | Content | Token budget (reference) | Trigger |
 |------|------|-------------------|---------|
-| L1（摘要） | 文件顶部的 TL;DR 块（2-3 句话，≤5 行） | 总计 ≤500 tokens（所有 L1 块合计） | 默认加载级别，首次读取任何记忆文件 |
-| L2（片段） | 相关章节/条目的完整内容 | ≤2000 tokens（所有 L2 片段合计） | L1 指示该文件与当前任务直接相关；任务标签匹配召回预设 |
-| L3（全文） | 整个文件的完整内容 | ≤4000 tokens（单文件） | 需要精确措辞/解决矛盾/深度执行/L2 信息不足 |
+| L1 (summary) | TL;DR block at the top of the file (2-3 sentences, ≤5 lines) | Total ≤500 tokens (sum of all L1 blocks) | Default load level; first read of any memory file |
+| L2 (fragment) | Full content of relevant sections/entries | ≤2000 tokens (sum of all L2 fragments) | L1 indicates the file is directly relevant to the current task; task tag matches recall preset |
+| L3 (full text) | Complete content of the entire file | ≤4000 tokens (single file) | Need exact wording/resolve contradictions/deep execution/L2 insufficient |
 
-**升级规则：**
-- L1→L2：当 L1 的 TL;DR 表明文件内容与当前任务直接相关，或任务标签匹配文件的召回预设标签
-- L2→L3：当需要精确引用原文、解决 L2 中发现的矛盾、或执行深度实现任务
-- Token 预算是指导值不是硬限制：AI 根据当前模型能力和上下文使用量灵活调整
-- 上下文压力大时，优先保留 P0/P1 文件的 L2，将低优先级文件降级到 L1
+**Escalation rules:**
+- L1→L2: When the L1 TL;DR indicates the file content is directly relevant to the current task, or task tags match the file's recall preset tags
+- L2→L3: When exact quotation of the original text is needed, contradictions found in L2 need to be resolved, or deep implementation tasks need to be executed
+- Token budgets are guide values, not hard limits; AI adjusts flexibly based on current model capability and context usage
+- Under high context pressure, prioritize retaining L2 of P0/P1 files and downgrade low-priority files to L1
 
-## 记忆文件索引
+## Memory File Index
 
-### 核心类（P0/P1 优先级）
+### Core (P0/P1 priority)
 
-| 文件 | 内容 | SoT 等级 | 状态 |
+| File | Content | SoT level | Status |
 |------|------|---------|------|
-| [如 `memory/01_项目背景.md`] | 项目定位、目标用户、核心目标、价值观、禁区 | L1 | valid |
-| [如 `memory/02_硬约束.md`] | 不可违反的红线规则 | L0 | valid |
+| [e.g., `memory/01_project_background.md`] | Project positioning, target users, core goals, values, no-go zones | L1 | valid |
+| [e.g., `memory/02_hard_constraints.md`] | Red-line rules that cannot be violated | L0 | valid |
 
-### 规则类（P2 优先级）
+### Rules (P2 priority)
 
-| 文件 | 内容 | SoT 等级 | 状态 |
+| File | Content | SoT level | Status |
 |------|------|---------|------|
-| [如 `memory/03_工作流规则.md`] | 工作流规则/流程/触发词 | L4 | valid/pending |
-| [如 `memory/04_工程规范.md`] | 命名规则/格式规范 | L4 | valid/pending |
-| [如 `memory/05_平台策略.md`] | 平台策略（无则省略） | L4 | valid/pending |
+| [e.g., `memory/03_workflow_rules.md`] | Workflow rules/processes/triggers | L4 | valid/pending |
+| [e.g., `memory/04_engineering_specs.md`] | Naming rules/format specs | L4 | valid/pending |
+| [e.g., `memory/05_platform_strategy.md`] | Platform strategy (omit if none) | L4 | valid/pending |
 
-### 经验类（P1/P2 优先级）
+### Experience (P1/P2 priority)
 
-| 文件 | 内容 | SoT 等级 | 状态 |
+| File | Content | SoT level | Status |
 |------|------|---------|------|
-| [如 `memory/06_决策日志.md`] | 决策记录（为什么选 A 不选 B） | L2 | valid |
-| [如 `memory/07_经验教训.md`] | 踩坑记录/最佳实践 | L3 | valid |
+| [e.g., `memory/06_decision_log.md`] | Decision records (why choose A over B) | L2 | valid |
+| [e.g., `memory/07_lessons_learned.md`] | Pitfall records/best practices | L3 | valid |
 
-### 动态类（AI 自动维护）
+### Dynamic (AI auto-maintained)
 
-| 文件 | 内容 | SoT 等级 | 状态 |
+| File | Content | SoT level | Status |
 |------|------|---------|------|
-| [如 `memory/08_版本历史.md`] | 版本变更日志 | L5 | valid |
-| [如 `memory/log.md`] | 工作日志 | L5 | valid |
+| [e.g., `memory/08_version_history.md`] | Version change log | L5 | valid |
+| [e.g., `memory/log.md`] | Work log | L5 | valid |
 
-## 上下文语料（Context）
+## Context Corpus
 
-大量参考资料存放在 `context/` 目录的结构化子目录中：
-- `context/research/` — 研究/调研/竞品分析（按需创建）
-- `context/meetings/` — 会议纪要/讨论记录（按需创建）
-- `context/prd/` — 需求文档/功能规格（按需创建）
-- `context/courses/` — 课程笔记/学习资料（按需创建）
-- `context/reference/` — 参考文档/手册/规范（按需创建）
+A large amount of reference material is stored in the structured subdirectories of the `context/` directory:
+- `context/research/` — Research/surveys/competitive analysis (create as needed)
+- `context/meetings/` — Meeting minutes/discussion records (create as needed)
+- `context/prd/` — Requirements docs/feature specs (create as needed)
+- `context/courses/` — Course notes/learning materials (create as needed)
+- `context/reference/` — Reference docs/manuals/specs (create as needed)
 
-详见 `context/README.md` 语料索引。记忆文件中只保留语料导航入口，不复制全文内容。语料文件为 SoT L6（最低权威），仅供参考，不覆盖高等级记忆信息。
+See `context/README.md` for the corpus index. Memory files only retain the corpus navigation entry; do not copy full content. Corpus files are SoT L6 (lowest authority), for reference only, and do not override higher-level memory information.
 
-## 目录结构速查
+## Directory Structure Quick Reference
 
-[AI 根据实际创建的文件结构填写]
+[Filled by AI based on the actual file structure created]
 
-## 记忆生命周期规则
+## Memory Lifecycle Rules
 
-1. **元数据头强制**：每个记忆文件必须以「TL;DR + 元数据表」开头，元数据包含 last_updated / authority_level（SoT 等级）/ scope / status
-2. **状态管理**：
-   - `valid`：已确认、当前生效的信息
-   - `pending`：新写入/待确认的信息（自动记录的决策/纠错初始状态）；用户确认或后续引用无异议后转为 valid
-   - `deprecated`：已废弃/被替代的信息；标记后不删除，移至文件末尾「归档」区，不参与仲裁
-3. **冲突检测**：
-   - 写入新信息前，扫描目标文件的 TL;DR 和相关章节标题，检查是否与已有内容重复或矛盾
-   - 如有矛盾：(a) 高等级为 valid → 不覆盖，向用户说明冲突；(b) 高等级为 deprecated → 可以写入；(c) 同等级 → 标注冲突待裁决
-4. **去重/合并**：当任何记忆文件超过 200 行时，AI **必须**（不是建议）：
-   - 识别重复/冗余条目并合并
-   - 为长条目提炼 TL;DR
-   - 将 deprecated 条目移至归档区
-   - 完成后更新元数据 last_updated
-5. **pending → valid 转换**：
-   - 用户明确确认（「对」「是的」「记住这个」）→ 转为 valid
-   - 下一次相关任务中 AI 引用该信息且用户无异议 → 可转为 valid
-   - pending 超过 7 天未被确认或引用 → AI 在 Checkpoint 中提醒用户确认
-6. **决策必记原因**：重要决策必须记录「为什么选 A 不选 B」和考虑过的替代方案
-7. **踩坑必记**：出错/返工/用户纠正必须即时写入经验教训（pending 状态），注明触发条件
-8. **过期退出**：失效的规则/废弃的决策标注 deprecated 移至归档区，不堆积在有效区域
+1. **Mandatory metadata header**: Each memory file must begin with "TL;DR + metadata table"; metadata includes last_updated / authority_level (SoT level) / scope / status
+2. **State management**:
+   - `valid`: Confirmed, currently effective information
+   - `pending`: Newly written/to-be-confirmed information (initial state of auto-recorded decisions/corrections); transitions to valid after user confirmation or no objection in subsequent references
+   - `deprecated`: Deprecated/replaced information; once marked, not deleted; moved to the "Archive" section at the end of the file; does not participate in arbitration
+3. **Conflict detection**:
+   - Before writing new information, scan the target file's TL;DR and section headings to check for duplication or contradiction with existing content
+   - If contradictory: (a) higher-level is valid → do not override, explain conflict to user; (b) higher-level is deprecated → can write; (c) same level → mark conflict for arbitration
+4. **Deduplication/merging**: When any memory file exceeds 200 lines, the AI **must** (not a suggestion):
+   - Identify and merge duplicate/redundant entries
+   - Extract TL;DRs for long entries
+   - Move deprecated entries to the archive section
+   - After completion, update metadata last_updated
+5. **Pending → valid transition**:
+   - User explicitly confirms ("yes", "correct", "remember this") → transition to valid
+   - AI references the information in the next related task without user objection → can transition to valid
+   - Pending exceeds 7 days without confirmation or reference → AI reminds user to confirm in Checkpoint
+6. **Decisions must record the reason**: Important decisions must record "why choose A over B" and the alternatives considered
+7. **Pitfalls must be recorded**: Errors/rework/user corrections must be written to lessons learned immediately (pending state), noting trigger conditions
+8. **Expiration exit**: Invalid rules/deprecated decisions are marked deprecated and moved to the archive section; do not accumulate in the active area
 
-## 记忆维护与自动更新规则
+## Memory Maintenance and Auto-Update Rules
 
-1. **主动提议更新**：里程碑完成后，AI 主动输出 `[记忆更新提议]`，等待一轮无异议则自动写入
-2. **即时自动记录**：犯错被纠正/做出决策/发现约束 → 直接写入对应文件 pending 状态
-3. **索引即时维护**：新文件创建时立即更新本索引和 `context/README.md`
-4. **用户主动更新**：用户说「更新记忆」「更新一下」时，AI 将近期未记录的工作沉淀
-5. **定期整理**：AI 在以下时机主动执行生命周期维护：文件超 200 行时、新会话开始时检测到膨胀、用户说「整理记忆」时
-6. **用户覆盖权**：用户可以随时修改/删除/合并任何记忆文件，AI 不得阻止
+1. **Proactive update proposal**: After milestone completion, AI proactively outputs `[Memory Update Proposal]`; auto-writes after one round without objection
+2. **Instant auto-recording**: Mistake corrected/decision made/constraint discovered → write directly to corresponding file in pending state
+3. **Index real-time maintenance**: Update this index and `context/README.md` immediately when new files are created
+4. **User-initiated update**: When user says "update memory" or "update", AI consolidates recent unrecorded work
+5. **Periodic cleanup**: AI proactively performs lifecycle maintenance at: file exceeding 200 lines, bloat detected at new session start, user saying "organize memory"
+6. **User override right**: User may modify/delete/merge any memory file at any time; AI must not prevent this
 
-## 白盒化原则
+## White-Box Principles
 
-- 工具（IDE/大模型/智能体插件）可随时替换
-- 资产（记忆系统 + 上下文语料）不可替换，是核心价值
-- 记忆文件存放在自己控制的目录，不绑定工具默认路径
-- 不依赖工具特有的个性化机制，确保切换工具时资产可直接迁移
-- 所有元数据、状态、规则均使用纯 Markdown 表达，无专有格式
+- Tools (IDE/large model/agent plugin) can be replaced at any time
+- Assets (memory system + context corpus) are irreplaceable; they are the core value
+- Memory files are stored in user-controlled directories, not bound to tool default paths
+- No reliance on tool-specific personalization mechanisms, ensuring assets can be directly migrated when switching tools
+- All metadata, states, and rules are expressed in pure Markdown, with no proprietary formats
 ```
 
-### 3.3 `memory/` 下的具体记忆文件
+### 3.3 Specific Memory Files under `memory/`
 
-**所有 memory/ 下的文件必须遵循统一模板。** AI 根据项目类型决定文件划分和命名，但每个文件必须包含以下结构：
+**All files under memory/ must follow the unified template.** The AI determines file partitioning and naming based on project type, but each file must contain the following structure:
 
-#### 统一文件模板
+#### Unified File Template
 
 ```markdown
-# [编号]_[文件名称]
+# [number]_[file_name]
 
-> **TL;DR**: [2-3 句话概括本文件最重要的信息。不超过 5 行。这是 L1 加载时看到的全部内容。]
+> **TL;DR**: [2-3 sentences summarizing the most important information in this file. No more than 5 lines. This is all that is seen during L1 loading.]
 
-## 元数据
+## Metadata
 
-| 属性 | 值 |
+| Property | Value |
 |------|-----|
-| 最后更新 | YYYY-MM-DD |
-| SoT 等级 | L0/L1/L2/L3/L4/L5 |
-| 范围 | [项目全局 / 特定领域 / 特定任务] |
-| 状态 | valid（整体状态；条目标记见下） |
+| Last updated | YYYY-MM-DD |
+| SoT level | L0/L1/L2/L3/L4/L5 |
+| Scope | [project global / specific domain / specific task] |
+| Status | valid (overall status; entry-level markings below) |
 
 ---
 
-## [核心内容区]
+## [Core Content Area]
 
-[文件正文内容，按主题分章节组织]
+[File body content, organized by topic into sections]
 
-### [条目示例格式]
+### [Entry example format]
 
-- **[条目名称]**（valid/pending/deprecated，YYYY-MM-DD）：[具体内容]
+- **[Entry name]** (valid/pending/deprecated, YYYY-MM-DD): [specific content]
 
 ---
 
-## 归档区（Deprecated）
+## Archive (Deprecated)
 
-[以下为已废弃的条目，保留供历史参考，不参与 SoT 仲裁]
+[The following are deprecated entries, kept for historical reference, not participating in SoT arbitration]
 
-- ~~[废弃条目]~~（deprecated，YYYY-MM-DD，原因：[被什么替代/为什么废弃]）
+- ~~[deprecated entry]~~ (deprecated, YYYY-MM-DD, reason: [what replaced it / why deprecated])
 ```
 
-#### 文件命名规则
+#### File Naming Rules
 
-- 使用数字前缀控制排序：`01_`、`02_`、`03_`...
-- 核心类（P0 文件）用 01-02 编号
-- 规则类用 03-05 编号
-- 经验类用 06-07 编号
-- 动态类用 08+ 编号
-- 使用英文蛇形命名或中文命名均可，但同一项目内要统一
+- Use numeric prefixes to control sorting: `01_`, `02_`, `03_`...
+- Core (P0 files) use 01-02
+- Rules use 03-05
+- Experience uses 06-07
+- Dynamic uses 08+
+- English snake_case or Chinese naming are both acceptable, but must be consistent within the same project
 
-#### 推荐分类框架（AI 可根据项目增减）
+#### Recommended Classification Framework (AI may add/remove by project)
 
-| 推荐文件 | SoT 等级 | 适用项目类型 | 初始 TL;DR |
+| Recommended file | SoT level | Applicable project types | Initial TL;DR |
 |---------|---------|------------|-----------|
-| 01_项目背景 | L1 | 所有项目 | 项目定位、目标用户、核心目标、价值观、禁区 |
-| 02_硬约束 | L0 | 所有项目 | 红线规则（初始可写「待完善」） |
-| 03_工作流规则 | L4 | 内容创作/产品开发 | 流程、确认点、触发词（初始可写「待补充」） |
-| 04_工程规范 | L4 | 软件开发/内容创作 | 命名规则、格式规范（初始可写「待补充」） |
-| 05_平台策略 | L4 | 多平台分发/运营 | 平台列表、发布策略（无则省略） |
-| 06_决策日志 | L2 | 所有项目 | 重要决策及原因、替代方案 |
-| 07_经验教训 | L3 | 所有项目 | 踩坑记录、最佳实践 |
-| 08_版本历史 | L5 | 所有项目 | 版本变更日志 |
+| 01_project_background | L1 | All projects | Project positioning, target users, core goals, values, no-go zones |
+| 02_hard_constraints | L0 | All projects | Red-line rules (initial may be "to be refined") |
+| 03_workflow_rules | L4 | Content creation/product development | Processes, confirmation points, triggers (initial may be "TBD") |
+| 04_engineering_specs | L4 | Software development/content creation | Naming rules, format specs (initial may be "TBD") |
+| 05_platform_strategy | L4 | Multi-platform distribution/operations | Platform list, publishing strategy (omit if none) |
+| 06_decision_log | L2 | All projects | Important decisions and reasons, alternatives |
+| 07_lessons_learned | L3 | All projects | Pitfall records, best practices |
+| 08_version_history | L5 | All projects | Version change log |
 
-#### 条目格式要求
+#### Entry Format Requirements
 
-- **决策日志条目**必须包含：日期、决策内容、原因/背景、考虑过的替代方案（未选的）、影响范围
-- **经验教训条目**必须包含：日期、问题/错误描述、根本原因、解决方案/预防措施、**触发条件**（什么场景下需要查阅这条教训）
-- 每个条目独立标注状态（valid/pending/deprecated）和日期，不只是文件整体状态
+- **Decision log entries** must include: date, decision content, reason/background, alternatives considered (not chosen), impact scope
+- **Lessons learned entries** must include: date, problem/error description, root cause, solution/preventive measures, **trigger condition** (in what scenario this lesson should be consulted)
+- Each entry independently marks status (valid/pending/deprecated) and date, not just the file's overall status
 
-#### 关键原则
+#### Key Principles
 
-- 文件数量根据项目复杂度决定，简单项目可以合并文件
-- **不要强制创建固定数量的文件**，够用就好
-- 初始阶段信息不足的文件，TL;DR 写「待完善」，元数据标记 valid（空文件），等待后续填充
-- 合并文件时 SoT 等级取最高等级（如合并 L2 和 L3 文件，整体标记 L2，但内容中区分来源）
+- The number of files is determined by project complexity; simple projects may merge files
+- **Do not force creating a fixed number of files**; enough is enough
+- For files with insufficient information in the initial stage, write "to be refined" in TL;DR, mark metadata as valid (empty file), and wait for subsequent filling
+- When merging files, take the highest SoT level (e.g., merging L2 and L3 files, mark overall as L2, but distinguish sources in content)
 
-### 3.4 `context/` 结构化知识库
+### 3.4 `context/` Structured Knowledge Base
 
-context/ 目录用于存放参考资料、书籍、文章、文档的 Markdown 转换文件。v3.0 采用子目录分类结构。
+The context/ directory is used to store Markdown-converted files of reference materials, books, articles, and documents. v3.0 uses a subdirectory classification structure.
 
-#### 目录结构
+#### Directory Structure
 
 ```
 context/
-├── README.md          ← 语料总索引（AI 自动维护）
-├── research/          ← [按需创建] 市场调研、竞品分析、行业报告
-├── meetings/          ← [按需创建] 会议纪要、讨论记录、访谈记录
-├── prd/               ← [按需创建] 产品需求文档、功能规格、设计文档
-├── courses/           ← [按需创建] 课程笔记、书籍摘要、学习资料
-└── reference/         ← [按需创建] 参考手册、规范文档、API 文档
+├── README.md          ← Corpus master index (AI auto-maintained)
+├── research/          ← [create as needed] Market research, competitive analysis, industry reports
+├── meetings/          ← [create as needed] Meeting minutes, discussion records, interview records
+├── prd/               ← [create as needed] Product requirement docs, feature specs, design docs
+├── courses/           ← [create as needed] Course notes, book summaries, learning materials
+└── reference/         ← [create as needed] Reference manuals, spec docs, API docs
 ```
 
-- 子目录在首次需要时创建，不强制初始创建全部 5 个
-- 如果某类资料为空，可以不建对应子目录
-- AI 根据资料性质自动判断放入哪个子目录
+- Subdirectories are created when first needed; do not force creating all 5 initially
+- If a category of materials is empty, the corresponding subdirectory need not be created
+- AI automatically judges which subdirectory to place materials in based on their nature
 
-#### 语料文件统一模板
+#### Unified Corpus File Template
 
-每个放入 context/ 的 MD 文件必须遵循以下模板：
+Each MD file placed in context/ must follow this template:
 
 ```markdown
-# [资料标题]
+# [Material title]
 
-> **摘要**: [AI 生成的 2-3 句结构化摘要，包含核心观点/关键数据/结论。L1 加载时读此部分。]
+> **Summary**: [AI-generated 2-3 sentence structured summary, including core viewpoints/key data/conclusions. Read this part during L1 loading.]
 
-## 元数据
+## Metadata
 
-| 属性 | 值 |
+| Property | Value |
 |------|-----|
-| 来源 | [URL/书名/会议名/文件名] |
-| 日期 | YYYY-MM-DD（资料发布日期或获取日期） |
-| 标签 | [tag1, tag2, tag3] |
-| 可信度 | high / medium / low |
-| 分类 | research / meetings / prd / courses / reference |
-| 最后索引 | YYYY-MM-DD（AI 更新索引的日期） |
+| Source | [URL/book title/meeting title/file name] |
+| Date | YYYY-MM-DD (material publication date or acquisition date) |
+| Tags | [tag1, tag2, tag3] |
+| Confidence | high / medium / low |
+| Category | research / meetings / prd / courses / reference |
+| Last indexed | YYYY-MM-DD (date AI updated the index) |
 
 ---
 
-## 要点提炼
+## Key Points
 
-[AI 生成的结构化要点，key points 形式，便于 L2 加载快速获取信息]
+[AI-generated structured key points, in key points form, for quick information retrieval during L2 loading]
 
-- [要点 1]
-- [要点 2]
-- [要点 3]
+- [Key point 1]
+- [Key point 2]
+- [Key point 3]
 ...
 
 ---
 
-## 全文
+## Full Text
 
-[完整内容：原文转换/笔记/记录等]
+[Complete content: original conversion/notes/records, etc.]
 ```
 
-#### `context/README.md` 语料索引模板
+#### `context/README.md` Corpus Index Template
 
 ```markdown
-# 上下文知识库（Context Knowledge Base）
+# Context Knowledge Base
 
-本目录存放项目相关的参考资料，统一转换为 Markdown 格式，按类别分子目录存放。
+This directory stores project-related reference materials, uniformly converted to Markdown format and organized by category into subdirectories.
 
-## 与记忆系统的区别
-- **记忆（memory/）**：精炼的规则、决策、经验，每次任务按需注入，SoT L0-L5
-- **语料（context/）**：原始参考资料全文和结构化摘要，只在需要时检索，SoT L6（最低权威，不覆盖记忆中的规则和决策）
+## Difference from Memory System
+- **Memory (memory/)**: Refined rules, decisions, experiences; injected per task on demand; SoT L0-L5
+- **Corpus (context/)**: Original reference material full text and structured summaries; retrieved only when needed; SoT L6 (lowest authority, does not override rules and decisions in memory)
 
-## 语料索引
+## Corpus Index
 
-[AI 自动维护，新增文件时即时更新]
+[AI auto-maintained, updated in real time when new files are added]
 
-### research/（研究/调研）
+### research/ (Research/Survey)
 
-| 文件 | 标签 | 可信度 | 摘要 | 日期 |
+| File | Tags | Confidence | Summary | Date |
 |------|------|--------|------|------|
-| （暂无） | | | | |
+| (none yet) | | | | |
 
-### meetings/（会议/讨论）
+### meetings/ (Meetings/Discussions)
 
-| 文件 | 标签 | 可信度 | 摘要 | 日期 |
+| File | Tags | Confidence | Summary | Date |
 |------|------|--------|------|------|
-| （暂无） | | | | |
+| (none yet) | | | | |
 
-### prd/（需求/规格）
+### prd/ (Requirements/Specs)
 
-| 文件 | 标签 | 可信度 | 摘要 | 日期 |
+| File | Tags | Confidence | Summary | Date |
 |------|------|--------|------|------|
-| （暂无） | | | | |
+| (none yet) | | | | |
 
-### courses/（课程/学习）
+### courses/ (Courses/Learning)
 
-| 文件 | 标签 | 可信度 | 摘要 | 日期 |
+| File | Tags | Confidence | Summary | Date |
 |------|------|--------|------|------|
-| （暂无） | | | | |
+| (none yet) | | | | |
 
-### reference/（参考/手册）
+### reference/ (Reference/Manuals)
 
-| 文件 | 标签 | 可信度 | 摘要 | 日期 |
+| File | Tags | Confidence | Summary | Date |
 |------|------|--------|------|------|
-| （暂无） | | | | |
+| (none yet) | | | | |
 
-## 使用方法
-1. 将 PPT/Word/PDF/书籍/网页等资料解析转换为 MD 文件，放入对应子目录
-2. 文件必须包含元数据表和 AI 生成摘要（遵循模板）
-3. AI 在添加文件时自动更新本索引
-4. 召回时先读本索引（L1），根据摘要判断相关性，再读取具体文件的要点提炼（L2）或全文（L3）
-5. 大量存量资料可安排 token 充足时（如夜间挂机）让 AI 一次性全量扫描初始化
+## Usage
+1. Parse and convert materials such as PPT/Word/PDF/books/web pages into MD files and place them in the corresponding subdirectory
+2. Files must include a metadata table and AI-generated summary (following the template)
+3. AI automatically updates this index when adding files
+4. On recall, first read this index (L1), judge relevance by summary, then read specific file's key points (L2) or full text (L3)
+5. For large amounts of existing materials, schedule a one-time full scan initialization by AI when tokens are ample (e.g., overnight unattended)
 ```
 
-### 3.5 工作日志（灵活配置）
+### 3.5 Work Log (Flexible Configuration)
 
-AI 询问用户日志偏好（或根据使用习惯推荐）：
-- **单日志文件**（推荐，简单）：`memory/log.md`，追加写入
-- **按日**：`memory/daily/YYYY-MM-DD.md`
-- **按月**：`memory/monthly/YYYY-MM.md`
-- **不单独建日志**：直接记在版本历史中
+AI asks the user about log preference (or recommends based on usage habits):
+- **Single log file** (recommended, simple): `memory/log.md`, append-write
+- **By day**: `memory/daily/YYYY-MM-DD.md`
+- **By month**: `memory/monthly/YYYY-MM.md`
+- **No separate log**: Record directly in version history
 
-**不要强制每日一文件。** 每个人使用习惯不同，以舒服为准。
+**Do not force one file per day.** Everyone's usage habits differ; comfort is the priority.
 
-初始日志内容：
+Initial log content:
 
 ```markdown
-# 工作日志
+# Work Log
 
-> **TL;DR**: 记录每次工作的关键进展、决策和待办。按时间倒序追加。
+> **TL;DR**: Records key progress, decisions, and to-dos from each work session. Appended in reverse chronological order.
 
-## 元数据
+## Metadata
 
-| 属性 | 值 |
+| Property | Value |
 |------|-----|
-| 最后更新 | YYYY-MM-DD |
-| SoT 等级 | L5 |
-| 范围 | 项目全局 |
-| 状态 | valid |
+| Last updated | YYYY-MM-DD |
+| SoT level | L5 |
+| Scope | Project global |
+| Status | valid |
 
 ---
 
 ## YYYY-MM-DD
-- 初始化记忆系统 v3.0（Knowledge OS）
-- [后续工作记录]
+- Initialized memory system v3.0 (Knowledge OS)
+- [subsequent work records]
 
 ---
 
-## 归档区
+## Archive
 
-（暂无）
+(none yet)
 ```
 
-### 3.6 用户级记忆文件（如用户选择创建）
+### 3.6 User-level Memory Files (if user chooses to create)
 
-用户级记忆存放在跨项目通用位置，在所有项目中共享。所有用户级记忆文件遵循与项目级相同的元数据+TL;DR 模板规范。
+User-level memory is stored in a cross-project universal location and shared across all projects. All user-level memory files follow the same metadata + TL;DR template specification as project-level.
 
-**关键决策**：用户级记忆的 SoT 等级在用户空间内有效，**不参与项目级 SoT 仲裁**。项目规则（L0-L5）始终优先于个人偏好。
+**Key decision**: The SoT level of user-level memory is valid within the user's space and **does not participate in project-level SoT arbitration**. Project rules (L0-L5) always take precedence over personal preferences.
 
-**`agent.md`（全局规则）**：跨项目通用的 AI 规则、人设。内容结构同项目级 agent.md 的简化版，重点在全局规则（语言偏好、输出风格、通用交互规则）而非项目特有规则。
+**`agent.md` (Global Rules)**: Cross-project universal AI rules, persona. The content structure is a simplified version of the project-level agent.md, focusing on global rules (language preferences, output style, general interaction rules) rather than project-specific rules.
 
-**`preferences.md`（用户偏好）**：
+**`preferences.md` (User Preferences)**:
 
 ```markdown
-# 用户偏好
+# User Preferences
 
-> **TL;DR**: [2-3 句话概括用户最核心的偏好。初始为待补充。]
+> **TL;DR**: [2-3 sentences summarizing the user's most core preferences. Initially TBD.]
 
-## 元数据
+## Metadata
 
-| 属性 | 值 |
+| Property | Value |
 |------|-----|
-| 最后更新 | YYYY-MM-DD |
-| 范围 | 跨项目全局 |
-| 状态 | valid |
+| Last updated | YYYY-MM-DD |
+| Scope | Cross-project global |
+| Status | valid |
 
 ---
 
-## 语言与输出
-- 输出语言：[中文/英文/双语 / 待补充]
-- 详细程度：[简洁/详细/按需调整 / 待补充]
-- 格式偏好：[Markdown/纯文本/其他 / 待补充]
+## Language and Output
+- Output language: [Chinese/English/bilingual / TBD]
+- Level of detail: [concise/detailed/adjusted on demand / TBD]
+- Format preference: [Markdown/plain text/other / TBD]
 
-## 交互风格
-- [待补充：如喜欢先给结论再展开/喜欢边思考边输出等]
+## Interaction Style
+- [TBD: e.g., prefers conclusion first then expansion / prefers thinking while outputting, etc.]
 
-## 工具与环境
-- 常用工具：[待补充]
-- 操作系统/环境：[待补充]
+## Tools and Environment
+- Commonly used tools: [TBD]
+- Operating system/environment: [TBD]
 
-## 不喜欢/禁区
-- [待补充：不希望 AI 做的事情]
+## Dislikes/No-Go Zones
+- [TBD: things the user does not want AI to do]
 ```
 
-**`knowledge.md`（跨项目知识）**：
+**`knowledge.md` (Cross-project Knowledge)**:
 
 ```markdown
-# 用户领域知识
+# User Domain Knowledge
 
-> **TL;DR**: [2-3 句话概括用户的核心知识领域和专长。初始为待补充。]
+> **TL;DR**: [2-3 sentences summarizing the user's core knowledge domains and expertise. Initially TBD.]
 
-## 元数据
+## Metadata
 
-| 属性 | 值 |
+| Property | Value |
 |------|-----|
-| 最后更新 | YYYY-MM-DD |
-| 范围 | 跨项目全局 |
-| 状态 | valid |
+| Last updated | YYYY-MM-DD |
+| Scope | Cross-project global |
+| Status | valid |
 
 ---
 
-## 专业领域
-- [领域 1]：[掌握程度/关键知识/常用框架 / 待补充]
-- [领域 2]：[...]
+## Professional Domains
+- [Domain 1]: [proficiency/key knowledge/common frameworks / TBD]
+- [Domain 2]: [...]
 
-## 思维模型与方法论
-- [待补充：常用的思维模型/分析框架/决策方法]
+## Mental Models and Methodologies
+- [TBD: commonly used mental models/analytical frameworks/decision-making methods]
 
-## 已知概念（不需要解释的）
-- [待补充：列出用户已经非常熟悉、AI 不需要从头解释的概念和术语]
+## Known Concepts (no explanation needed)
+- [TBD: list concepts and terms the user is already very familiar with and that AI does not need to explain from scratch]
 ```
 
-**`lessons-learned.md`（通用经验教训）**：
+**`lessons-learned.md` (General Lessons Learned)**:
 
 ```markdown
-# 通用经验教训
+# General Lessons Learned
 
-> **TL;DR**: [2-3 句话概括最重要的跨项目经验。初始为待补充。]
+> **TL;DR**: [2-3 sentences summarizing the most important cross-project lessons. Initially TBD.]
 
-## 元数据
+## Metadata
 
-| 属性 | 值 |
+| Property | Value |
 |------|-----|
-| 最后更新 | YYYY-MM-DD |
-| 范围 | 跨项目全局 |
-| 状态 | valid |
+| Last updated | YYYY-MM-DD |
+| Scope | Cross-project global |
+| Status | valid |
 
 ---
 
-## 通用反模式
-- [待补充：跨项目的常见错误/反模式]
+## General Anti-patterns
+- [TBD: common mistakes/anti-patterns across projects]
 
-## 通用最佳实践
-- [待补充：跨项目验证有效的工作方法/原则]
+## General Best Practices
+- [TBD: working methods/principles validated across projects]
 
 ---
 
-## 归档区
+## Archive
 
-（暂无）
+(none yet)
 ```
 
-## 步骤 4：存量资料初始化指引
+## Step 4: Existing Materials Initialization Guidance
 
-如果 AI 探测到项目已有大量文档资料（docs/、文章、参考资料等），在汇报时主动给出初始化建议：
+If the AI detects that the project already has a large amount of documentation (docs/, articles, reference materials, etc.), proactively provide initialization suggestions in the report:
 
 ```
-## 存量资料初始化建议
+## Existing Materials Initialization Suggestions
 
-检测到本项目存在现有文档资料。建议在 token 充足时（如夜间挂机），让 AI 执行一次全量初始化：
+Detected that this project has existing documentation. Suggest having AI perform a one-time full initialization when tokens are ample (e.g., overnight unattended):
 
-1. 对 AI 说：「扫描项目所有文档，初始化记忆系统和语料库」
-2. AI 会读取所有历史文档，提炼关键信息写入记忆文件（含元数据和 TL;DR）
-3. 将参考资料转换为 MD 格式，按类型存入 `context/` 对应子目录（research/meetings/prd/courses/reference/）
-4. 每个语料文件添加元数据表（来源/日期/标签/可信度/分类）和 AI 生成摘要
-5. 更新 `context/README.md` 语料总索引
-6. 更新 `memory.md` 中的记忆文件索引
-7. 协助设置初始目标栈（长期愿景和当前阶段）
+1. Tell the AI: "Scan all project documents and initialize the memory system and corpus"
+2. AI will read all historical documents, extract key information, and write it to memory files (including metadata and TL;DR)
+3. Convert reference materials to MD format and store them by type in the corresponding subdirectories of `context/` (research/meetings/prd/courses/reference/)
+4. Add a metadata table (source/date/tags/confidence/category) and AI-generated summary to each corpus file
+5. Update `context/README.md` corpus master index
+6. Update the memory file index in `memory.md`
+7. Assist in setting up the initial goal stack (long-term vision and current phase)
 ```
 
-## 步骤 5：完成汇报
+## Step 5: Completion Report
 
-创建完成后向用户汇报：
-1. 探测结果摘要表格（含目标信息）
-2. 已创建的文件列表及分类逻辑（为什么这么分）
-3. 标记为「待补充」的字段清单
-4. 目标栈初始状态说明（哪些层级待用户填写）
-5. **自动更新机制说明**：AI 会在里程碑后主动提议记录，犯错时即时记教训，无需每次说「更新记忆」
-6. **Checkpoint 机制说明**：长任务中 AI 会定期输出进度检查点，防止偏离
-7. **SoT 权威层级说明**：信息冲突时的仲裁规则
-8. **防漂移提醒**：AI 会在偏离目标时主动提醒
-9. 防污染提醒：不同任务/不同项目开新会话
-10. 如有存量资料，给出初始化建议（含 context/ 子目录分类指引）
-11. `memory.md` 导航地图 + 目标栈预览
+After creation, report to the user:
+1. Detection results summary table (including target information)
+2. List of created files and classification logic (why this division)
+3. List of fields marked as `[TBD]`
+4. Initial state of the goal stack (which levels need user input)
+5. **Auto-update mechanism explanation**: AI will proactively propose recording after milestones, immediately record lessons when making mistakes, no need to say "update memory" every time
+6. **Checkpoint mechanism explanation**: AI will periodically output progress checkpoints during long tasks to prevent deviation
+7. **SoT authority hierarchy explanation**: Arbitration rules for information conflicts
+8. **Anti-drift reminder**: AI will proactively remind when deviating from goals
+9. Anti-pollution reminder: Open a new session for different tasks/projects
+10. If there are existing materials, provide initialization suggestions (including context/ subdirectory classification guidance)
+11. `memory.md` navigation map + goal stack preview
 
-## 步骤 6：Knowledge OS 运行机制（AI 执行指南）
+## Step 6: Knowledge OS Runtime Mechanism (AI Execution Guide)
 
-本章节是给 AI 的执行参考，不直接生成到用户文件中。AI 在使用记忆系统时必须遵循以下运行机制。
+This section is an execution reference for the AI and is not directly generated into user files. The AI must follow these runtime mechanisms when using the memory system.
 
-### 6.1 目标锚定执行流程
+### 6.1 Goal Anchoring Execution Flow
 
-1. 每次收到用户消息时，内部执行：
-   a. 读取 `memory.md` 的目标栈
-   b. 判断当前请求与目标栈的对齐度：
-      - 对齐（直接推进当前任务）→ 正常执行
-      - 弱偏离（服务于阶段目标但非当前任务）→ 执行前输出黄色提醒
-      - 强偏离（与阶段目标无关/违反硬约束）→ 暂停，给出三个选项（切换/记侧线/取消）
-2. 目标栈更新：
-   - 用户明确说「更新目标」「这个做完了」「进入下一阶段」时更新
-   - AI 不得自行修改目标栈
-   - 更新后记录到 `memory.md` 并更新 last_updated
-3. 侧线管理：
-   - 弱偏离但有用的请求记入「待办侧线」（在 Checkpoint 中列出）
-   - 主线任务完成后，AI 主动提醒侧线待办
+1. Each time a user message is received, internally execute:
+   a. Read the goal stack in `memory.md`
+   b. Assess the alignment of the current request with the goal stack:
+      - Aligned (directly advances current task) → execute normally
+      - Weak deviation (serves phase goal but not current task) → output yellow reminder before execution
+      - Strong deviation (unrelated to phase goal / violates hard constraints) → pause, give three options (switch/note side-track/cancel)
+2. Goal stack update:
+   - Update when user explicitly says "update goal", "this is done", "move to next phase"
+   - AI must not modify the goal stack on its own
+   - After update, record in `memory.md` and update last_updated
+3. Side-track management:
+   - Weak deviations that are useful are recorded in "todo side-track" (listed in Checkpoint)
+   - After main-thread task is complete, AI proactively reminds about side-track to-dos
 
-### 6.2 Checkpoint 与注意力防护执行流程
+### 6.2 Checkpoint and Attention Protection Execution Flow
 
-1. **Checkpoint 输出时机**：
-   - 每完成 3 个实质性操作步骤
-   - 对话轮次超过 10 轮
-   - 从一个子任务切换到另一个子任务
-   - 用户表达困惑或重复提问
-   - AI 检测到自身回复质量下降
-2. **Checkpoint 格式**：严格按照 `agent.md` 中定义的格式输出，简洁不啰嗦
-3. **主线保护**：
-   - 用户插入新需求 → 紧急且快速 → 立即处理后回来；不紧急 → 记入侧线继续主线
-   - 用户说「先做X」→ 切换主线，旧主线记入侧线
-4. **上下文重建**：
-   - 检测信号：AI 重复自己、遗漏关键信息、用户连续纠正 2 次、回复泛泛而谈
-   - 建议语：「当前会话上下文可能已饱和，建议开新会话。我将生成交接摘要。」
-   - 交接摘要必须包含：当前目标+已完成+进行中+待办侧线+关键约束+需加载的记忆文件列表
+1. **Checkpoint output timing**:
+   - Every 3 substantive operation steps completed
+   - Conversation rounds exceed 10
+   - Switching from one subtask to another
+   - User expresses confusion or repeats questions
+   - AI detects degradation in its own reply quality
+2. **Checkpoint format**: Strictly follow the format defined in `agent.md`; concise, not verbose
+3. **Main-thread protection**:
+   - User inserts new request → urgent and quick → handle immediately and return; not urgent → note in side-track and continue main thread
+   - User says "do X first" → switch main thread, note old main thread in side-track
+4. **Context reconstruction**:
+   - Detection signals: AI repeating itself, omitting key information, user correcting 2 times in a row, replies becoming generic
+   - Suggested phrasing: "Current session context may be saturated. Suggest opening a new session. I will generate a handover summary."
+   - Handover summary must include: current goal + completed + in progress + todo side-track + key constraints + list of memory files to load
 
-### 6.3 SoT 仲裁执行流程
+### 6.3 SoT Arbitration Execution Flow
 
-1. 读取多个记忆文件发现信息矛盾时：
-   a. 检查各条目的 SoT 等级（从文件元数据和条目状态获取）
-   b. 高等级 valid 条目 > 低等级 valid 条目
-   c. 同等级 valid 条目：以 last_updated 较新的为准
-   d. pending 条目不覆盖 valid 条目
-   e. deprecated 条目不参与仲裁
-   f. 无法裁决 → 告知用户冲突内容，请用户裁决
-2. 用户明确说「以 X 为准」时，用户指令临时高于 SoT（但不自动修改记忆文件中的 SoT 等级，除非用户要求更新）
-3. 用户级记忆与项目级记忆冲突时，以项目级为准
+1. When reading multiple memory files and discovering contradictory information:
+   a. Check the SoT level of each entry (from file metadata and entry status)
+   b. Higher-level valid entry > lower-level valid entry
+   c. Same-level valid entries: the one with the more recent last_updated prevails
+   d. Pending entries do not override valid entries
+   e. Deprecated entries do not participate in arbitration
+   f. Cannot arbitrate → inform user of the conflict and ask for arbitration
+2. When user explicitly says "take X as authoritative", user instruction temporarily takes precedence over SoT (but does not automatically modify the SoT level in memory files, unless user requests an update)
+3. When user-level memory conflicts with project-level memory, project-level prevails
 
-### 6.4 记忆生命周期治理执行流程
+### 6.4 Memory Lifecycle Governance Execution Flow
 
-1. **写入前检查**：
-   - 检查目标文件是否存在、当前行数
-   - 扫描目标文件的 TL;DR 和相关章节标题，检查是否与已有内容重复或矛盾
-   - 矛盾 → 执行 SoT 仲裁流程
-   - 重复 → 合并而非追加
-2. **写入时**：
-   - 自动添加条目状态（自动记录的初始为 pending，用户明确确认的为 valid）
-   - 添加日期标记
-   - 更新文件元数据的 last_updated
-3. **写入后检查**：
-   - 如果文件超过 200 行 → 立即执行去重/合并/归档
-   - 更新 `memory.md` 索引中的元数据状态
-4. **pending → valid 转换**：
-   - 用户明确确认 → 转为 valid
-   - 后续引用无异议 → 可转为 valid
-   - pending 超 7 天 → Checkpoint 中提醒用户确认
-5. **deprecated 标记**：
-   - 新信息替代旧信息 → 旧条目标记 deprecated 并注明替代者
-   - 用户明确说不用了 → 标记 deprecated
-   - deprecated 条目移至文件末尾「归档区」
+1. **Pre-write check**:
+   - Check whether the target file exists and its current line count
+   - Scan the target file's TL;DR and section headings to check for duplication or contradiction with existing content
+   - Contradiction → execute SoT arbitration flow
+   - Duplication → merge rather than append
+2. **On write**:
+   - Automatically add entry status (auto-recorded initial state is pending; explicitly user-confirmed is valid)
+   - Add date mark
+   - Update file metadata last_updated
+3. **Post-write check**:
+   - If file exceeds 200 lines → immediately execute deduplication/merging/archiving
+   - Update the metadata status in the `memory.md` index
+4. **Pending → valid transition**:
+   - User explicitly confirms → transition to valid
+   - No objection in subsequent references → can transition to valid
+   - Pending exceeds 7 days → remind user to confirm in Checkpoint
+5. **Deprecated marking**:
+   - New information replaces old information → mark old entry as deprecated and note the replacement
+   - User explicitly says no longer needed → mark as deprecated
+   - Deprecated entries are moved to the file's "Archive" section at the end
 
-### 6.5 自动更新触发执行流程
+### 6.5 Auto-Update Trigger Execution Flow
 
-1. **主动提议更新（等待一轮）**：
-   - 触发时机：完成里程碑
-   - 输出格式严格为：`[记忆更新提议] 我准备将 [简要内容] 记录到 [目标文件]。原因：[原因]。如无异议将自动记录。`
-   - 下一轮用户未反对 → 写入；用户反对 → 不写入或调整
-2. **即时自动记录（不等待）**：
-   - AI 犯错被纠正 → 立即写入经验教训（pending，注明触发条件）
-   - AI 做出有替代方案的决策 → 写入决策日志（pending，注明替代方案）
-   - 发现新约束 → 写入对应文件（pending）
-   - 新文件创建 → 立即更新索引
-3. **不自动记录**：纯讨论/闲聊、用户说「不用记」、临时信息
-4. **更新范围**：只追加不删改（除非用户明确要求）；默认 pending 状态
+1. **Proactive update proposal (wait one round)**:
+   - Trigger: milestone completed
+   - Output format strictly: `[Memory Update Proposal] I plan to record [brief content] in [target file]. Reason: [reason]. Will record automatically if no objection.`
+   - User does not object in next round → write; user objects → do not write or adjust
+2. **Instant auto-recording (no wait)**:
+   - AI makes a mistake and is corrected → immediately write to lessons learned (pending, note trigger condition)
+   - AI makes a decision with alternatives → write to decision log (pending, note alternatives)
+   - New constraint discovered → write to corresponding file (pending)
+   - New file created → immediately update index
+3. **Not auto-recorded**: pure discussion/chitchat, user says "don't record", temporary information
+4. **Update scope**: Append only, no deletion/modification (unless user explicitly requests); default pending state
 
-### 6.6 三级加载执行流程
+### 6.6 Three-Level Loading Execution Flow
 
-1. **会话开始时**：
-   - L3 加载 `memory.md`（全文，因为它是索引）
-   - 根据任务类型从「任务类型→召回预设」表确定初始加载文件集
-   - L1 加载初始文件集的 TL;DR
-2. **执行任务中**：
-   - 首次读取任何记忆文件 → L1（TL;DR + 元数据）
-   - 相关性判断 → 相关则升级 L2，不相关则跳过
-   - L2 读取时只读与当前任务相关的章节/条目
-   - 需要精确措辞/发现矛盾/深度执行 → 升级 L3
-3. **Token 预算管理**：
-   - 内部估算已加载 token 量
-   - L1 总计 ≤500 tokens，L2 总计 ≤2000 tokens（参考值）
-   - 接近上下文极限时，优先保留 P0/P1 文件的 L2，降级低优先级到 L1
-4. **加载降级**：
-   - 任务切换时，之前加载的 L2/L3 可以降级（不再作为重点参考）
-   - 上下文压力大时，主动将低优先级文件从 L2 降级到 L1
+1. **At session start**:
+   - L3 load `memory.md` (full text, because it is the index)
+   - Determine the initial file set to load from the "Task type → recall preset" table based on task type
+   - L1 load the TL;DR of the initial file set
+2. **During task execution**:
+   - First read of any memory file → L1 (TL;DR + metadata)
+   - Relevance judgment → if relevant, escalate to L2; if not, skip
+   - When L2 reading, only read sections/entries relevant to the current task
+   - Need exact wording/conflict discovered/deep execution → escalate to L3
+3. **Token budget management**:
+   - Internally estimate loaded token count
+   - L1 total ≤500 tokens, L2 total ≤2000 tokens (reference values)
+   - When approaching context limit, prioritize retaining L2 of P0/P1 files; downgrade low-priority to L1
+4. **Loading downgrade**:
+   - On task switch, previously loaded L2/L3 can be downgraded (no longer a key reference)
+   - Under high context pressure, proactively downgrade low-priority files from L2 to L1
 
-## 记忆系统铁律（Knowledge OS v3.0）
+## Memory System Iron Rules (Knowledge OS v3.0)
 
-1. **`memory.md` 是入口**：AI 每次对话先读 memory.md（L3 全文）
-2. **目标栈是指南针**：每次回复前检查目标对齐，偏离必提醒
-3. **Checkpoint 防漂移**：长任务必须定期输出进度检查点
-4. **SoT 解决矛盾**：信息冲突按 L0→L6 权威等级仲裁，高等级覆盖低等级
-5. **存储服务于召回**：记忆是为了在正确场景找到正确信息，不是为了囤信息
-6. **三级加载省 token**：默认 L1 摘要，需要时 L2 片段，深度时 L3 全文
-7. **导航地图比文件列表重要**：告诉 AI「什么时候读什么、读到哪一级」
-8. **元数据是基础设施**：每个文件必须有 TL;DR + 元数据表（last_updated/SoT等级/范围/状态）
-9. **记忆有生命周期**：valid/pending/deprecated 三态管理，200 行必须去重合并
-10. **决策必记原因**：只记「做了什么」不记「为什么」等于没记
-11. **自动更新不等待**：里程碑后主动提议记录，犯错即时记教训，新文件即时更索引
-12. **经验教训是执行前检查清单**：每个环节执行前扫描相关教训
-13. **AI 自动分类**：用户定义顶层框架，具体分类交给 AI
-14. **不编造原则**：无法探测的信息标记「待补充」，自动记录的初始为 pending
-15. **白盒化+防污染**：资产存放在自己控制的目录，纯 MD 无绑定，不交叉污染
+1. **`memory.md` is the entry**: AI reads memory.md first at the start of every conversation (L3 full text)
+2. **Goal stack is the compass**: Check goal alignment before each reply; remind on deviation
+3. **Checkpoint prevents drift**: Long tasks must periodically output progress checkpoints
+4. **SoT resolves conflicts**: Information conflicts arbitrated by L0→L6 authority levels; higher levels override lower
+5. **Storage serves recall**: Memory is about finding the right information in the right scenario, not hoarding information
+6. **Three-level loading saves tokens**: Default L1 summary, L2 fragments when needed, L3 full text for depth
+7. **Navigation map is more important than file list**: Tell AI "when to read what, to what level"
+8. **Metadata is infrastructure**: Each file must have TL;DR + metadata table (last_updated/SoT level/scope/status)
+9. **Memory has a lifecycle**: Three-state management (valid/pending/deprecated); 200 lines mandates dedup/merge
+10. **Decisions must record reasons**: Recording "what was done" without "why" is equivalent to not recording
+11. **Auto-update without waiting**: Proactively propose recording after milestones; immediately record lessons on mistakes; immediately update index on new files
+12. **Lessons learned are pre-execution checklists**: Scan relevant lessons before executing each step
+13. **AI auto-classifies**: User defines top-level framework; specific classification delegated to AI
+14. **No fabrication principle**: Information that cannot be detected is marked `[TBD]`; auto-recorded initial state is pending
+15. **White-box + anti-pollution**: Assets stored in user-controlled directories; pure MD, no binding; no cross-pollution
 
-## 防污染规则
+## Anti-Pollution Rules
 
-- 生成的文件中不得包含当前项目之外的任何旧项目名称、私有信息
-- **信息黑名单**：生成内容中禁止出现以下私有信息（除非是在该项目本身的记忆系统中）：
-  - 其他历史项目名称（用户自己的任何过往项目名）
-  - 个人账号信息（具体 UID、具体粉丝数、具体收益数据）
-  - 个人身份信息（真实姓名、手机号、邮箱、地址）
-  - 密钥/令牌/密码等敏感信息
-- 不得引用其他项目的具体数据、账号、平台策略
-- 本 Skill 是通用脚手架，所有内容必须适配目标项目本身
-- 不同项目的记忆目录物理隔离，不交叉引用
-- 自动更新记录时，不得将其他项目/会话中的信息写入当前项目
-- AI 在生成记忆内容时，如果识别到可能属于其他项目的信息，必须排除
+- Generated files must not contain any old project names or private information outside the current project
+- **Information blacklist**: The following private information must not appear in generated content (unless within the current project's own memory system):
+  - Other historical project names (any of the user's past project names)
+  - Personal account information (specific UIDs, specific follower counts, specific revenue data)
+  - Personal identity information (real names, phone numbers, emails, addresses)
+  - Keys/tokens/passwords and other sensitive information
+- Must not reference specific data, accounts, or platform strategies from other projects
+- This Skill is a universal scaffold; all content must fit the target project itself
+- Memory directories of different projects are physically isolated; no cross-referencing
+- When auto-updating records, information from other projects/sessions must not be written to the current project
+- When AI generates memory content, if it identifies information that may belong to another project, it must exclude it
 
-## 风险提示与免责声明
+## Risk Notice and Disclaimer
 
-- **准确性自行验证**：本 Skill 生成的记忆文件、项目信息探测结果、自动记录的决策与教训等内容，均由 AI 基于当前工作区推断或执行产生，可能存在偏差或错误。用户在将其作为重要决策依据前，**必须自行核实准确性**。AI 不对生成内容的正确性、完整性、适用性作任何明示或暗示的担保。
-- **第三方服务条款**：若用户在本记忆系统运行过程中调用任何第三方 API、模型服务、平台接口（如大模型 API、云存储、自动化工具等），**必须遵守对应服务的使用条款、速率限制、数据合规与隐私政策**。本 Skill 本身不依赖任何第三方 API，但用户在使用生成物时可能引入第三方依赖，相关合规责任由用户自行承担。
-- **敏感操作边界**：AI 不得代替用户执行需要人工判断的敏感操作（如正式发布、对外发送、付款、签署、删除生产数据等）。记忆系统中记录的「待办」「决策」仅为参考，不构成执行授权。
-- **数据本地化责任**：所有记忆文件均生成在用户本地，本 Skill 不提供云端同步、备份、加密能力。用户需自行规划备份策略，因本地磁盘故障、误删、误改造成的数据损失，本 Skill 不承担责任。
+- **Accuracy self-verification**: The memory files, project information detection results, auto-recorded decisions and lessons, etc., generated by this Skill are all inferred or executed by AI based on the current workspace, and may contain deviations or errors. Before using them as a basis for important decisions, users **must verify accuracy themselves**. AI makes no express or implied warranty regarding the correctness, completeness, or applicability of the generated content.
+- **Third-party service terms**: If users invoke any third-party APIs, model services, or platform interfaces (such as large model APIs, cloud storage, automation tools, etc.) during the operation of this memory system, **they must comply with the corresponding service's terms of use, rate limits, data compliance, and privacy policies**. This Skill itself does not depend on any third-party API, but users may introduce third-party dependencies when using the generated artifacts; relevant compliance responsibilities are borne by the user.
+- **Sensitive operation boundaries**: AI must not perform sensitive operations requiring human judgment on behalf of the user (such as official publishing, external sending, payment, signing, deleting production data, etc.). "To-dos" and "decisions" recorded in the memory system are for reference only and do not constitute execution authorization.
+- **Data localization responsibility**: All memory files are generated locally on the user's machine; this Skill does not provide cloud synchronization, backup, or encryption capabilities. Users must plan their own backup strategies; this Skill is not liable for data loss caused by local disk failures, accidental deletion, or accidental modification.

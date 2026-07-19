@@ -1,28 +1,28 @@
 #!/usr/bin/env bash
-# memory-system-scaffold 一键安装脚本（macOS / Linux）
-# 兼容 macOS 自带 bash 3.2，不使用关联数组
+# memory-system-scaffold installer (macOS / Linux)
+# Compatible with macOS default bash 3.2 (no associative arrays)
 #
-# 用法：
-#   ./install.sh                          # 交互式
-#   ./install.sh --tool trae              # 直接指定工具
-#   ./install.sh --tool cursor --global   # 全局安装
-#   ./install.sh --help                   # 查看帮助
+# Usage:
+#   ./install.sh                          # interactive
+#   ./install.sh --tool trae              # specify tool directly
+#   ./install.sh --tool cursor --global   # global install
+#   ./install.sh --help                   # show help
 
 set -e
 
-# 颜色
+# Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-# 脚本所在目录（即仓库根目录 = Skill 文件夹）
+# Script directory (repository root = Skill folder)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# 需要复制的 Skill 文件（LICENSE/install 脚本不复制，留作仓库元数据）
+# Skill files to copy (LICENSE/install scripts are not copied, kept as repo metadata)
 SKILL_FILES=("SKILL.md" "README.md")
 
-# 工具名映射（用 case 实现，兼容 bash 3.2）
+# Tool name mapping (using case for bash 3.2 compatibility)
 get_tool_name() {
   case "$1" in
     trae)         echo "TRAE" ;;
@@ -34,7 +34,7 @@ get_tool_name() {
   esac
 }
 
-# 项目级目标路径（相对当前工作目录）
+# Project-level target path (relative to current working directory)
 get_project_path() {
   case "$1" in
     trae)         echo "./.trae/skills/memory-system-scaffold" ;;
@@ -46,7 +46,7 @@ get_project_path() {
   esac
 }
 
-# 全局目标路径（仅 trae / cursor 支持）。空字符串表示不支持
+# Global target path (only trae / cursor supported). Empty string means not supported.
 get_global_path() {
   case "$1" in
     trae)         echo "$HOME/.trae-cn/builtin/global/skills/memory-system-scaffold" ;;
@@ -55,7 +55,7 @@ get_global_path() {
   esac
 }
 
-# 参数解析
+# Argument parsing
 TOOL=""
 GLOBAL=false
 while [ $# -gt 0 ]; do
@@ -70,62 +70,62 @@ while [ $# -gt 0 ]; do
       ;;
     --help|-h)
       cat <<'EOF'
-用法: ./install.sh [--tool <tool>] [--global]
+Usage: ./install.sh [--tool <tool>] [--global]
 
-可选工具: trae, cursor, codex, claude-code, workbuddy
-默认模式: 项目级安装（--global 切换为全局安装，仅 trae/cursor 支持）
+Available tools: trae, cursor, codex, claude-code, workbuddy
+Default mode: project-level install (--global switches to global install, only trae/cursor supported)
 
-示例:
-  ./install.sh                          # 交互式
-  ./install.sh --tool trae              # 安装到当前项目 TRAE
-  ./install.sh --tool cursor --global   # 全局安装到 Cursor
+Examples:
+  ./install.sh                          # interactive
+  ./install.sh --tool trae              # install to current project's TRAE
+  ./install.sh --tool cursor --global   # global install to Cursor
 EOF
       exit 0
       ;;
     *)
-      echo "未知参数: $1"
+      echo "Unknown argument: $1"
       exit 1
       ;;
   esac
 done
 
-# 校验源文件存在
+# Verify source files exist
 for f in "${SKILL_FILES[@]}"; do
   if [ ! -f "$SCRIPT_DIR/$f" ]; then
-    echo -e "${RED}错误：找不到必需文件 $f（脚本应在仓库根目录运行）${NC}"
+    echo -e "${RED}Error: required file $f not found (script should run from repo root)${NC}"
     exit 1
   fi
 done
 
-# 交互式选择工具
+# Interactive tool selection
 if [ -z "$TOOL" ]; then
-  echo -e "${BLUE}memory-system-scaffold 安装向导${NC}"
+  echo -e "${BLUE}memory-system-scaffold install wizard${NC}"
   echo ""
-  echo "选择目标 AI 工作台："
-  echo "  1) TRAE        （项目级 ./.trae/skills/，全局 ~/.trae-cn/builtin/global/skills/）"
-  echo "  2) Cursor      （项目级 ./.cursor/skills/，全局 ~/.cursor/skills/）"
-  echo "  3) Codex       （项目级 ./.codex/skills/）"
-  echo "  4) Claude Code （项目根目录 ./）"
-  echo "  5) WorkBuddy   （项目级 ./skills/）"
+  echo "Select target AI workbench:"
+  echo "  1) TRAE        (project: ./.trae/skills/, global: ~/.trae-cn/builtin/global/skills/)"
+  echo "  2) Cursor      (project: ./.cursor/skills/, global: ~/.cursor/skills/)"
+  echo "  3) Codex       (project: ./.codex/skills/)"
+  echo "  4) Claude Code (project root: ./)"
+  echo "  5) WorkBuddy   (project: ./skills/)"
   echo ""
-  read -rp "输入编号 [1-5]: " choice
+  read -rp "Enter number [1-5]: " choice
   case "$choice" in
     1) TOOL="trae" ;;
     2) TOOL="cursor" ;;
     3) TOOL="codex" ;;
     4) TOOL="claude-code" ;;
     5) TOOL="workbuddy" ;;
-    *) echo -e "${RED}无效选择${NC}"; exit 1 ;;
+    *) echo -e "${RED}Invalid choice${NC}"; exit 1 ;;
   esac
 
-  # 询问模式（仅支持全局的工具）
+  # Ask mode (only for tools that support global)
   GLOBAL_PATH_CHECK="$(get_global_path "$TOOL")"
   if [ -n "$GLOBAL_PATH_CHECK" ]; then
     echo ""
-    echo "选择安装模式："
-    echo "  1) 项目级（仅当前项目可用）"
-    echo "  2) 全局（所有项目可用）"
-    read -rp "输入编号 [1-2，默认 1]: " mode
+    echo "Select install mode:"
+    echo "  1) Project-level (available only in current project)"
+    echo "  2) Global (available in all projects)"
+    read -rp "Enter number [1-2, default 1]: " mode
     case "$mode" in
       2) GLOBAL=true ;;
       *) GLOBAL=false ;;
@@ -133,70 +133,70 @@ if [ -z "$TOOL" ]; then
   fi
 fi
 
-# 校验工具
+# Validate tool
 TOOL_NAME="$(get_tool_name "$TOOL")"
 if [ -z "$TOOL_NAME" ]; then
-  echo -e "${RED}未知工具: $TOOL${NC}"
-  echo "支持的工具: trae, cursor, codex, claude-code, workbuddy"
+  echo -e "${RED}Unknown tool: $TOOL${NC}"
+  echo "Supported tools: trae, cursor, codex, claude-code, workbuddy"
   exit 1
 fi
 
-# 确定目标路径
+# Determine target path
 if $GLOBAL; then
   TARGET_DIR="$(get_global_path "$TOOL")"
   if [ -z "$TARGET_DIR" ]; then
-    echo -e "${RED}${TOOL_NAME} 不支持全局安装${NC}"
+    echo -e "${RED}${TOOL_NAME} does not support global install${NC}"
     exit 1
   fi
-  MODE_DESC="全局"
+  MODE_DESC="global"
 else
   TARGET_DIR="$(get_project_path "$TOOL")"
-  MODE_DESC="项目级"
+  MODE_DESC="project-level"
 fi
 
-# Claude Code 特殊处理：直接复制到项目根目录
-# 展开为绝对路径便于显示
+# Claude Code special handling: copy directly to project root
+# Expand to absolute path for display
 if [ "$TARGET_DIR" = "." ]; then
   TARGET_DIR="$(pwd)"
 elif [ "${TARGET_DIR#"$HOME"}" != "$TARGET_DIR" ]; then
-  : # 已经是绝对路径（以 $HOME 开头）
+  : # Already absolute path (starts with $HOME)
 else
   TARGET_DIR="$(pwd)/$TARGET_DIR"
 fi
 
 echo ""
-echo -e "${BLUE}安装信息${NC}"
-echo "  工具：$TOOL_NAME"
-echo "  模式：$MODE_DESC"
-echo "  目标：$TARGET_DIR"
+echo -e "${BLUE}Install info${NC}"
+echo "  Tool: $TOOL_NAME"
+echo "  Mode: $MODE_DESC"
+echo "  Target: $TARGET_DIR"
 echo ""
 
-# 确认
-read -rp "确认安装？[y/N]: " confirm
+# Confirm
+read -rp "Confirm install? [y/N]: " confirm
 if ! echo "$confirm" | grep -qE "^[yY]"; then
-  echo "已取消"
+  echo "Cancelled"
   exit 0
 fi
 
-# 创建目录（Claude Code 不需要创建，目标是项目根目录）
+# Create directory (Claude Code doesn't need creation, target is project root)
 if [ "$TOOL" != "claude-code" ]; then
   mkdir -p "$TARGET_DIR"
 fi
 
-# 复制文件
+# Copy files
 for f in "${SKILL_FILES[@]}"; do
   cp "$SCRIPT_DIR/$f" "$TARGET_DIR/$f"
-  echo -e "  ${GREEN}✓${NC} $f → $TARGET_DIR/$f"
+  echo -e "  ${GREEN}✓${NC} $f -> $TARGET_DIR/$f"
 done
 
 echo ""
-echo -e "${GREEN}安装完成！${NC}"
+echo -e "${GREEN}Install complete!${NC}"
 echo ""
-echo "下一步："
+echo "Next steps:"
 if [ "$TOOL" = "claude-code" ]; then
-  echo "  在 Claude Code 中打开当前项目，说「搭建记忆系统」即可触发"
+  echo "  Open current project in Claude Code, say 'set up memory system' to trigger"
 else
-  echo "  打开 ${TOOL_NAME}，加载目标项目，说「搭建记忆系统」即可触发"
+  echo "  Open ${TOOL_NAME}, load target project, say 'set up memory system' to trigger"
 fi
 echo ""
-echo "更多用法详见 README.md"
+echo "See README.md for more usage."
