@@ -111,13 +111,19 @@ The AI will automatically detect project info, ask a few simple questions, and g
 
 ### Trigger Phrases
 
-Say any of the following in conversation to trigger:
+**This Skill supports both Chinese and English.** Say any of the following in conversation to trigger (Chinese and English phrases are equivalent — pick whichever language you're comfortable with):
 
-- `"搭建记忆系统"` ("set up memory system")
-- `"创建记忆文件"` ("create memory files")
-- `"初始化记忆系统"` ("initialize memory system")
-- `"setup memory system"`
-- `"优化记忆"` ("optimize memory"), `"重构记忆"` ("refactor memory"), `"整理记忆"` ("organize memory"), `"升级记忆系统"` ("upgrade memory system")
+| Chinese | English | Purpose |
+|---------|---------|---------|
+| `"搭建记忆系统"` | `"set up memory system"` | Initial setup |
+| `"创建记忆文件"` | `"create memory file"` | Initial setup |
+| `"初始化记忆系统"` | `"initialize memory system"` | Initial setup |
+| `"优化记忆"` | `"optimize memory"` | Refinement |
+| `"重构记忆"` | `"refactor memory"` | Refinement |
+| `"整理记忆"` | `"organize memory"` | Cleanup |
+| `"升级记忆系统"` | `"upgrade memory system"` | Upgrade |
+
+You can also mix languages (e.g., start with Chinese `"搭建记忆系统"` and later use English `"optimize memory"`). The AI treats them as the same intent.
 
 ### Initialization
 
@@ -130,15 +136,15 @@ After triggering, the AI will:
 
 ### Daily Usage
 
-After generation, your project has a complete Knowledge OS. Here are the most common daily operations:
+After generation, your project has a complete Knowledge OS. Here are the most common daily operations (Chinese and English trigger phrases both work):
 
-| What you want | What to say | What AI does |
-|---------------|-------------|--------------|
-| **Update goal** | `"更新目标"` ("update goal"), `"这个阶段完成了"` ("this phase is done"), `"进入下一阶段"` ("enter next phase") | Updates corresponding level in goal stack, records change history |
-| **Manually update memory** | `"更新记忆"` ("update memory"), `"更新一下"` ("update") | Sediments recent unrecorded work into corresponding memory files |
-| **Organize memory** | `"整理记忆"` ("organize memory"), `"清理记忆"` ("clean memory") | Deduplicates / merges redundant entries, marks deprecated, refines summaries |
-| **Import existing materials** | `"扫描项目所有文档，初始化记忆系统和语料库"` ("scan all project docs, initialize memory system and corpus") | Full scan of historical docs, extracts info into memory + corpus |
-| **Check progress** | (no need to say, auto-triggered) | Auto-outputs Checkpoint every 3 steps / 10 rounds in long tasks |
+| What you want | Chinese phrase | English phrase | What AI does |
+|---------------|----------------|----------------|--------------|
+| **Update goal** | `"更新目标"` / `"这个阶段完成了"` / `"进入下一阶段"` | `"update goal"` / `"this phase is done"` / `"enter next phase"` | Updates corresponding level in goal stack, records change history |
+| **Manually update memory** | `"更新记忆"` / `"更新一下"` | `"update memory"` | Sediments recent unrecorded work into corresponding memory files |
+| **Organize memory** | `"整理记忆"` / `"清理记忆"` | `"organize memory"` / `"clean memory"` | Deduplicates / merges redundant entries, marks deprecated, refines summaries |
+| **Import existing materials** | `"扫描项目所有文档，初始化记忆系统和语料库"` | `"scan all project docs, initialize memory system and corpus"` | Full scan of historical docs, extracts info into memory + corpus |
+| **Check progress** | (no need to say, auto-triggered) | (no need to say, auto-triggered) | Auto-outputs Checkpoint every 3 steps / 10 rounds in long tasks |
 
 **Things that happen automatically (you don't need to say):**
 

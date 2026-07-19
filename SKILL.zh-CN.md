@@ -1,6 +1,6 @@
 ---
 name: "memory-system-scaffold"
-description: "Generates a Knowledge OS-level white-box memory system with goal stack, attention drift protection, Source of Truth hierarchy, lifecycle governance, proactive auto-update, 3-level recall, and structured knowledge base. Invoke when user says '搭建记忆系统', '创建记忆文件', or a project needs context anchoring."
+description: "Generates a Knowledge OS-level white-box memory system with goal stack, attention drift protection, Source of Truth hierarchy, lifecycle governance, proactive auto-update, 3-level recall, and structured knowledge base. Invoke when user says '搭建记忆系统' / 'set up memory system', '创建记忆文件' / 'create memory file', or a project needs context anchoring. Supports both Chinese and English trigger phrases."
 globs: ["**/*.md"]
 version: "3.0.0"
 author: "custom"
@@ -26,10 +26,13 @@ author: "custom"
 
 ## 触发条件
 
-- 用户说「搭建记忆系统」「创建记忆文件」「初始化记忆系统」「setup memory system」
+**本 Skill 同时支持中文和英文触发词。** 用户可以使用任意一种语言（或混用）来触发。
+
+- 用户说以下任意一句：
+  - **中文**：「搭建记忆系统」「创建记忆文件」「初始化记忆系统」「优化记忆」「重构记忆」「整理记忆」「升级记忆系统」
+  - **英文**："set up memory system" / "create memory file" / "initialize memory system" / "optimize memory" / "refactor memory" / "organize memory" / "upgrade memory system"
 - 新项目/空目录缺少 `memory.md` 或 `agent.md`
 - 用户明确要求为当前项目建立上下文锚点
-- 用户说「优化记忆」「重构记忆」「整理记忆」「升级记忆系统」
 
 ## 前置检查（AI 必须先执行）
 

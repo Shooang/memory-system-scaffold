@@ -1,6 +1,6 @@
 ---
 name: "memory-system-scaffold"
-description: "Generates a Knowledge OS-level white-box memory system with goal stack, attention drift protection, Source of Truth hierarchy, lifecycle governance, proactive auto-update, 3-level recall, and structured knowledge base. Invoke when user says '搭建记忆系统', '创建记忆文件', or a project needs context anchoring."
+description: "Generates a Knowledge OS-level white-box memory system with goal stack, attention drift protection, Source of Truth hierarchy, lifecycle governance, proactive auto-update, 3-level recall, and structured knowledge base. Invoke when user says '搭建记忆系统' / 'set up memory system', '创建记忆文件' / 'create memory file', or a project needs context anchoring. Supports both Chinese and English trigger phrases."
 globs: ["**/*.md"]
 version: "3.0.0"
 author: "custom"
@@ -26,10 +26,13 @@ The memory system is the project's Knowledge OS (Knowledge Operating System). It
 
 ## Trigger Conditions
 
-- User says "搭建记忆系统" ("set up memory system"), "创建记忆文件" ("create memory file"), "初始化记忆系统" ("initialize memory system"), or "setup memory system"
+**This Skill supports both Chinese and English trigger phrases.** Users can say either language (or mix) to trigger.
+
+- User says any of:
+  - **Chinese**: "搭建记忆系统", "创建记忆文件", "初始化记忆系统", "优化记忆", "重构记忆", "整理记忆", "升级记忆系统"
+  - **English**: "set up memory system", "create memory file", "initialize memory system", "optimize memory", "refactor memory", "organize memory", "upgrade memory system"
 - New project / empty directory lacking `memory.md` or `agent.md`
 - User explicitly requests context anchoring for the current project
-- User says "优化记忆" ("optimize memory"), "重构记忆" ("refactor memory"), "整理记忆" ("organize memory"), or "升级记忆系统" ("upgrade memory system")
 
 ## Pre-checks (AI must perform first)
 
