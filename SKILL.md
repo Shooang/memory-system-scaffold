@@ -1,8 +1,8 @@
 ---
-name: "memory-system-scaffold"
+name: "memory-system"
 description: "Generates a Knowledge OS-level white-box memory system with goal stack, attention drift protection, Source of Truth hierarchy, lifecycle governance, proactive auto-update, 3-level recall, and structured knowledge base. Invoke when user says '搭建记忆系统' / 'set up memory system', '创建记忆文件' / 'create memory file', or a project needs context anchoring. Supports both Chinese and English trigger phrases."
 globs: ["**/*.md"]
-version: "3.0.0"
+version: 3.0.0
 author: "custom"
 ---
 

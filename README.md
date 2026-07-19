@@ -1,4 +1,4 @@
-# memory-system-scaffold v3.0 (Knowledge OS)
+# memory-system-scaffold v3 (Knowledge OS)
 
 **Language**: English | [简体中文](./README.zh-CN.md)
 
