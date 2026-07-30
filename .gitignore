@@ -61,3 +61,6 @@ coverage/
 # SkillHub upload artifacts (local only)
 .skillhub-upload/
 *.tgz
+
+# Marketing and interview materials (local only, not for public repo)
+xiaohongshu/
