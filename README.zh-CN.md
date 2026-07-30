@@ -12,7 +12,7 @@
 
 点击下方链接，打开交互式功能介绍页（点击任意卡片可查看详细解释）：
 
-**[→ 打开 Skill 介绍图](./skill-intro.html)**
+**[→ 打开 Skill 介绍图](https://htmlpreview.github.io/?https://github.com/Shooang/memory-system-scaffold/blob/main/skill-intro.html)**
 
 包含：6 大痛点 · 8 项核心功能 · 四层记忆架构 · SoT 权威层级 · 三级加载机制 · 进阶记忆管理 · 技术选型对比 · 实际效果数据
 
