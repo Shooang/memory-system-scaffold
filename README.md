@@ -8,6 +8,16 @@ An AI Skill that automatically generates a white-box Knowledge OS (Knowledge Ope
 
 ---
 
+## 📊 Interactive Overview
+
+Click the link below to open an interactive feature overview page (click any card for detailed explanations):
+
+**[→ Open Skill Overview](./skill-intro.html)**
+
+Includes: 6 pain points · 8 core features · 4-layer memory architecture · SoT authority hierarchy · 3-level loading · advanced memory management · tech comparison · real-world metrics
+
+---
+
 ## 🚀 30-Second Quick Start
 
 ### Option A: One-click Install Script (Recommended)

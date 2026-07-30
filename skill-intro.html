@@ -1,0 +1,1787 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI记忆助手 - Skill介绍图</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #333;
+        }
+        .container { 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        /* 头部 */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px;
+            text-align: center;
+            color: white;
+        }
+        .header h1 { 
+            font-size: 36px; 
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .header p { 
+            font-size: 16px; 
+            opacity: 0.9;
+        }
+        
+        /* 主内容区 */
+        .main-content { padding: 40px; }
+        
+        /* 模块样式 */
+        .section { 
+            margin-bottom: 40px; 
+            border-bottom: 1px solid #eee;
+            padding-bottom: 40px;
+        }
+        .section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .section-title { 
+            font-size: 20px; 
+            font-weight: 600; 
+            margin-bottom: 24px;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: #667eea;
+            border-radius: 2px;
+        }
+        
+        /* 痛点卡片 */
+        .pain-points { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .pain-card { 
+            background: #fff5f5; 
+            border-left: 4px solid #ff6b6b;
+            padding: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .pain-card:hover { 
+            transform: translateX(4px); 
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.2);
+        }
+        .pain-card strong { color: #ff6b6b; display: block; margin-bottom: 8px; }
+        
+        /* 核心功能 */
+        .features { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .feature-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+        }
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 12px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        .feature-card:nth-child(1) .feature-icon { background: #e8f5e9; }
+        .feature-card:nth-child(2) .feature-icon { background: #e3f2fd; }
+        .feature-card:nth-child(3) .feature-icon { background: #fff3e0; }
+        .feature-card:nth-child(4) .feature-icon { background: #f3e5f5; }
+        .feature-card:nth-child(5) .feature-icon { background: #e0f7fa; }
+        .feature-card.feature-6 .feature-icon { background: #fce4ec; }
+        .feature-card.feature-7 .feature-icon { background: #ede7f6; }
+        .feature-card.feature-8 .feature-icon { background: #efebe9; }
+        .feature-title { font-weight: 600; margin-bottom: 8px; font-size: 14px; }
+        .feature-desc { font-size: 12px; color: #666; line-height: 1.5; }
+
+        /* 记忆管理进阶机制 */
+        .advanced-block {
+            margin-bottom: 28px;
+        }
+        .advanced-block:last-child { margin-bottom: 0; }
+        .advanced-sub-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 14px;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 子模块A：信息降噪流程图 */
+        .denoise-flow {
+            display: flex;
+            align-items: stretch;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .denoise-step {
+            flex: 1;
+            min-width: 120px;
+            background: #f8f9fa;
+            border: 2px solid #e8eaf6;
+            border-radius: 10px;
+            padding: 14px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+            position: relative;
+        }
+        .denoise-step:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+        }
+        .denoise-step-icon {
+            font-size: 22px;
+            margin-bottom: 6px;
+        }
+        .denoise-step-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+        }
+        .denoise-step-desc {
+            font-size: 11px;
+            color: #888;
+            margin-top: 4px;
+        }
+        .denoise-arrow {
+            display: flex;
+            align-items: center;
+            color: #667eea;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        /* 子模块B：任务接力表 */
+        .relay-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #e8eaf6;
+        }
+        .relay-table th {
+            background: #667eea;
+            color: white;
+            padding: 12px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: left;
+        }
+        .relay-table td {
+            padding: 12px 14px;
+            font-size: 13px;
+            border-top: 1px solid #e8eaf6;
+            color: #444;
+        }
+        .relay-row {
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .relay-row:hover {
+            background: #f0f4ff;
+        }
+
+        /* 子模块C：主动遗忘时间线 */
+        .forget-timeline {
+            position: relative;
+            padding-left: 24px;
+        }
+        .forget-timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            background: linear-gradient(to bottom, #ff9800, #9c27b0);
+            border-radius: 1px;
+        }
+        .forget-item {
+            position: relative;
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .forget-item:last-child { margin-bottom: 0; }
+        .forget-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .forget-item::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 18px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid #667eea;
+        }
+        .forget-item:nth-child(1)::before { border-color: #ff9800; }
+        .forget-item:nth-child(2)::before { border-color: #2196f3; }
+        .forget-item:nth-child(3)::before { border-color: #9c27b0; }
+        .forget-item:nth-child(4)::before { border-color: #f44336; }
+        .forget-trigger {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .forget-result {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+        
+        /* 四层架构图 */
+        .architecture {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+        .layer {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 24px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 600px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .layer:hover { 
+            transform: translateX(8px); 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .layer-number {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+        .layer-content { flex: 1; }
+        .layer-title { font-weight: 600; font-size: 15px; }
+        .layer-desc { font-size: 13px; color: #666; margin-top: 4px; }
+        
+        .layer-1 { background: #e8f5e9; border-left: 4px solid #4caf50; }
+        .layer-1 .layer-number { background: #4caf50; }
+        .layer-2 { background: #e3f2fd; border-left: 4px solid #2196f3; }
+        .layer-2 .layer-number { background: #2196f3; }
+        .layer-3 { background: #fff3e0; border-left: 4px solid #ff9800; }
+        .layer-3 .layer-number { background: #ff9800; }
+        .layer-4 { background: #f3e5f5; border-left: 4px solid #9c27b0; }
+        .layer-4 .layer-number { background: #9c27b0; }
+        
+        .arrow-down {
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 12px solid #ddd;
+        }
+        
+        /* 文件结构 */
+        .file-tree {
+            background: #2d2d2d;
+            color: #ccc;
+            padding: 24px;
+            border-radius: 12px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+        .file-tree .folder { color: #e6b422; font-weight: bold; }
+        .file-tree .file { color: #67cdcc; }
+        .file-tree .comment { color: #666; }
+        .file-tree .arrow { color: #666; }
+        
+        /* SoT 层级 */
+        .sot-levels {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .sot-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .sot-item:hover { 
+            transform: translateX(4px); 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .sot-level {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+        }
+        .sot-item:nth-child(1) .sot-level { background: #f44336; }
+        .sot-item:nth-child(2) .sot-level { background: #ff9800; }
+        .sot-item:nth-child(3) .sot-level { background: #ffc107; }
+        .sot-item:nth-child(4) .sot-level { background: #4caf50; }
+        .sot-item:nth-child(5) .sot-level { background: #2196f3; }
+        .sot-item:nth-child(6) .sot-level { background: #9c27b0; }
+        .sot-item:nth-child(7) .sot-level { background: #607d8b; }
+        
+        /* 三级加载 */
+        .loading-levels {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            align-items: flex-start;
+        }
+        .loading-card {
+            text-align: center;
+            width: 180px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .loading-card:hover { transform: scale(1.05); }
+        .loading-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+        }
+        .loading-card:nth-child(1) .loading-circle { 
+            background: linear-gradient(135deg, #4caf50 0%, #8bc34a 100%); 
+            width: 60px; height: 60px;
+        }
+        .loading-card:nth-child(2) .loading-circle { 
+            background: linear-gradient(135deg, #2196f3 0%, #64b5f6 100%); 
+            width: 100px; height: 100px;
+        }
+        .loading-card:nth-child(3) .loading-circle { 
+            background: linear-gradient(135deg, #9c27b0 0%, #ce93d8 100%); 
+            width: 140px; height: 140px;
+        }
+        
+        /* 底部 */
+        .footer {
+            background: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        /* 弹窗样式 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.active { display: flex; }
+        
+        .modal {
+            background: white;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: modalFadeIn 0.3s ease;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px;
+            border-bottom: 1px solid #eee;
+            position: sticky;
+            top: 0;
+            background: white;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .modal-icon {
+            font-size: 28px;
+            margin-right: 12px;
+        }
+        
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: #f0f0f0;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        
+        .modal-close:hover { background: #e0e0e0; }
+        
+        .modal-content {
+            padding: 24px;
+            line-height: 1.8;
+            color: #333;
+        }
+        
+        .modal-content h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 20px 0 12px;
+            color: #667eea;
+        }
+        
+        .modal-content ul {
+            margin: 12px 0;
+            padding-left: 20px;
+        }
+        
+        .modal-content li {
+            margin-bottom: 8px;
+            color: #555;
+        }
+        
+        .modal-content strong {
+            color: #333;
+        }
+        
+        .modal-content .highlight {
+            background: #f0f4ff;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 12px 0;
+            border-left: 4px solid #667eea;
+        }
+        
+        .modal-content .tip {
+            background: #fff9e6;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 12px 0;
+            border-left: 4px solid #ffc107;
+            font-size: 14px;
+        }
+        
+        /* 响应式 */
+        @media (max-width: 900px) {
+            .features { grid-template-columns: repeat(2, 1fr); }
+            .pain-points { grid-template-columns: 1fr; }
+            .loading-levels { flex-direction: column; align-items: center; }
+            .compare-table { font-size: 12px; }
+        }
+
+        /* 技术选型对比 */
+        .compare-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #e8eaf6;
+        }
+        .compare-table th {
+            background: #667eea;
+            color: white;
+            padding: 12px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: left;
+        }
+        .compare-table th:first-child { width: 22%; }
+        .compare-table td {
+            padding: 12px 14px;
+            font-size: 13px;
+            border-top: 1px solid #e8eaf6;
+            color: #444;
+        }
+        .compare-table td:first-child { font-weight: 600; color: #333; }
+        .compare-table tr:hover td { background: #f8f9ff; }
+        .compare-yes { color: #4caf50; font-weight: 600; }
+        .compare-no { color: #f44336; }
+        .compare-partial { color: #ff9800; }
+
+        /* 实际效果 */
+        .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .metric-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e8f5e9 100%);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.2);
+        }
+        .metric-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: #4caf50;
+            margin-bottom: 4px;
+        }
+        .metric-label {
+            font-size: 13px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <h1>🧠 AI记忆助手</h1>
+            <p>为任意项目自动生成白盒化分层记忆系统，让AI记住项目关键信息，减少上下文遗忘</p>
+        </div>
+        
+        <div class="main-content">
+            <!-- 痛点 -->
+            <div class="section">
+                <div class="section-title">🔴 解决的痛点</div>
+                <div class="pain-points">
+                    <div class="pain-card" onclick="openModal('pain-1')">
+                        <strong>目标漂移</strong>
+                        <span>聊到第10轮，AI就忘了最开始的目标是什么</span>
+                    </div>
+                    <div class="pain-card" onclick="openModal('pain-2')">
+                        <strong>信息冲突</strong>
+                        <span>同一个问题反复问，每次答案还不一样</span>
+                    </div>
+                    <div class="pain-card" onclick="openModal('pain-3')">
+                        <strong>文件散落</strong>
+                        <span>项目文件散落在各处，AI找不到关键信息</span>
+                    </div>
+                    <div class="pain-card" onclick="openModal('pain-4')">
+                        <strong>工具绑定</strong>
+                        <span>换个AI工具，之前的上下文全没了</span>
+                    </div>
+                    <div class="pain-card" onclick="openModal('pain-5')">
+                        <strong>上下文膨胀</strong>
+                        <span>垃圾信息和重复对话占满窗口，关键信息被挤掉</span>
+                    </div>
+                    <div class="pain-card" onclick="openModal('pain-6')">
+                        <strong>记忆堆积</strong>
+                        <span>信息只增不减，过期记忆变成噪音干扰决策</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 核心功能 -->
+            <div class="section">
+                <div class="section-title">✨ 核心功能</div>
+                <div class="features">
+                    <div class="feature-card" onclick="openModal('feature-1')">
+                        <div class="feature-icon">🎯</div>
+                        <div class="feature-title">目标栈管理</div>
+                        <div class="feature-desc">四层目标拆解，AI回复前先对齐目标</div>
+                    </div>
+                    <div class="feature-card" onclick="openModal('feature-2')">
+                        <div class="feature-icon">⚖️</div>
+                        <div class="feature-title">信息冲突仲裁</div>
+                        <div class="feature-desc">SoT层级体系，自动处理信息冲突</div>
+                    </div>
+                    <div class="feature-card" onclick="openModal('feature-3')">
+                        <div class="feature-icon">📚</div>
+                        <div class="feature-title">三级加载</div>
+                        <div class="feature-desc">L1摘要→L2片段→L3全文，省Token</div>
+                    </div>
+                    <div class="feature-card" onclick="openModal('feature-4')">
+                        <div class="feature-icon">🔄</div>
+                        <div class="feature-title">主动更新</div>
+                        <div class="feature-desc">里程碑后主动提议记录，犯错自动写入</div>
+                    </div>
+                    <div class="feature-card" onclick="openModal('feature-5')">
+                        <div class="feature-icon">♻️</div>
+                        <div class="feature-title">生命周期</div>
+                        <div class="feature-desc">有效/待确认/已废弃，自动去重合并</div>
+                    </div>
+                    <div class="feature-card feature-6" onclick="openModal('feature-6')">
+                        <div class="feature-icon">🔇</div>
+                        <div class="feature-title">信息降噪</div>
+                        <div class="feature-desc">入记忆前过滤噪音，语义判断+重要性评分</div>
+                    </div>
+                    <div class="feature-card feature-7" onclick="openModal('feature-7')">
+                        <div class="feature-icon">🔗</div>
+                        <div class="feature-title">任务接力</div>
+                        <div class="feature-desc">大任务拆解为子任务，上下文隔离+交付物传递</div>
+                    </div>
+                    <div class="feature-card feature-8" onclick="openModal('feature-8')">
+                        <div class="feature-icon">🧹</div>
+                        <div class="feature-title">主动遗忘</div>
+                        <div class="feature-desc">时间衰减+频率衰减，休眠/废弃自动管理</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 四层记忆架构 -->
+            <div class="section">
+                <div class="section-title">🏗️ 四层记忆架构</div>
+                <div class="architecture">
+                    <div class="layer layer-1" onclick="openModal('layer-1')">
+                        <div class="layer-number">L1</div>
+                        <div class="layer-content">
+                            <div class="layer-title">工作记忆</div>
+                            <div class="layer-desc">当前会话上下文，任务级临时存储</div>
+                        </div>
+                    </div>
+                    <div class="arrow-down"></div>
+                    <div class="layer layer-2" onclick="openModal('layer-2')">
+                        <div class="layer-number">L2</div>
+                        <div class="layer-content">
+                            <div class="layer-title">项目记忆</div>
+                            <div class="layer-desc">目标栈、决策记录、经验教训、流程规范</div>
+                        </div>
+                    </div>
+                    <div class="arrow-down"></div>
+                    <div class="layer layer-3" onclick="openModal('layer-3')">
+                        <div class="layer-number">L3</div>
+                        <div class="layer-content">
+                            <div class="layer-title">知识记忆</div>
+                            <div class="layer-desc">用户偏好、领域知识、跨项目经验</div>
+                        </div>
+                    </div>
+                    <div class="arrow-down"></div>
+                    <div class="layer layer-4" onclick="openModal('layer-4')">
+                        <div class="layer-number">L4</div>
+                        <div class="layer-content">
+                            <div class="layer-title">语料库</div>
+                            <div class="layer-desc">参考资料全文，按需检索</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SoT 层级 -->
+            <div class="section">
+                <div class="section-title">📊 SoT 权威层级（冲突仲裁规则）</div>
+                <div class="sot-levels">
+                    <div class="sot-item" onclick="openModal('sot-0')"><div class="sot-level">L0</div><span>硬约束（红线规则）</span></div>
+                    <div class="sot-item" onclick="openModal('sot-1')"><div class="sot-level">L1</div><span>项目背景与目标</span></div>
+                    <div class="sot-item" onclick="openModal('sot-2')"><div class="sot-level">L2</div><span>决策记录（含原因）</span></div>
+                    <div class="sot-item" onclick="openModal('sot-3')"><div class="sot-level">L3</div><span>经验教训</span></div>
+                    <div class="sot-item" onclick="openModal('sot-4')"><div class="sot-level">L4</div><span>流程规范</span></div>
+                    <div class="sot-item" onclick="openModal('sot-5')"><div class="sot-level">L5</div><span>工作日志</span></div>
+                    <div class="sot-item" onclick="openModal('sot-6')"><div class="sot-level">L6</div><span>参考资料（最低权威）</span></div>
+                </div>
+            </div>
+            
+            <!-- 三级加载机制 -->
+            <div class="section">
+                <div class="section-title">⏬ 三级加载机制（Token 管理）</div>
+                <div class="loading-levels">
+                    <div class="loading-card" onclick="openModal('loading-1')">
+                        <div class="loading-circle">L1</div>
+                        <div style="font-weight:600;margin-bottom:4px;">摘要加载</div>
+                        <div style="font-size:12px;color:#666;">TL;DR + 元数据<br>≤500 tokens</div>
+                    </div>
+                    <div class="loading-card" onclick="openModal('loading-2')">
+                        <div class="loading-circle">L2</div>
+                        <div style="font-weight:600;margin-bottom:4px;">片段加载</div>
+                        <div style="font-size:12px;color:#666;">相关章节/条目<br>≤2000 tokens</div>
+                    </div>
+                    <div class="loading-card" onclick="openModal('loading-3')">
+                        <div class="loading-circle">L3</div>
+                        <div style="font-weight:600;margin-bottom:4px;">全文加载</div>
+                        <div style="font-size:12px;color:#666;">完整文件内容<br>按需加载</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 记忆管理进阶机制 -->
+            <div class="section">
+                <div class="section-title">🧠 记忆管理进阶机制</div>
+
+                <!-- 子模块A：信息降噪层 -->
+                <div class="advanced-block">
+                    <div class="advanced-sub-title">🔇 A. 信息降噪层</div>
+                    <div class="denoise-flow">
+                        <div class="denoise-step" onclick="openModal('denoise-1')">
+                            <div class="denoise-step-icon">🔍</div>
+                            <div class="denoise-step-title">语义判断</div>
+                            <div class="denoise-step-desc">事实/决策/经验 vs 情绪/重复</div>
+                        </div>
+                        <div class="denoise-arrow">→</div>
+                        <div class="denoise-step" onclick="openModal('denoise-2')">
+                            <div class="denoise-step-icon">👤</div>
+                            <div class="denoise-step-title">角色判断</div>
+                            <div class="denoise-step-desc">用户/AI推断/外部资料</div>
+                        </div>
+                        <div class="denoise-arrow">→</div>
+                        <div class="denoise-step" onclick="openModal('denoise-3')">
+                            <div class="denoise-step-icon">⭐</div>
+                            <div class="denoise-step-title">重要性评分</div>
+                            <div class="denoise-step-desc">1-5分，&lt;3分不写入</div>
+                        </div>
+                        <div class="denoise-arrow">→</div>
+                        <div class="denoise-step" onclick="openModal('denoise-1')">
+                            <div class="denoise-step-icon">✅</div>
+                            <div class="denoise-step-title">通过 / 丢弃</div>
+                            <div class="denoise-step-desc">写入记忆 / 过滤掉</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 子模块B：任务接力机制 -->
+                <div class="advanced-block">
+                    <div class="advanced-sub-title">🔗 B. 任务接力机制</div>
+                    <table class="relay-table">
+                        <thead>
+                            <tr>
+                                <th>子任务</th>
+                                <th>负责 Agent</th>
+                                <th>上下文范围</th>
+                                <th>交付物</th>
+                                <th>下一个</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="relay-row" onclick="openModal('relay-row')">
+                                <td>市场调研</td>
+                                <td>调研 Agent</td>
+                                <td>行业报告 + 用户画像</td>
+                                <td>调研报告.md</td>
+                                <td>竞品分析</td>
+                            </tr>
+                            <tr class="relay-row" onclick="openModal('relay-row')">
+                                <td>竞品分析</td>
+                                <td>分析 Agent</td>
+                                <td>调研报告 + 竞品资料</td>
+                                <td>竞品对比.md</td>
+                                <td>方案撰写</td>
+                            </tr>
+                            <tr class="relay-row" onclick="openModal('relay-row')">
+                                <td>方案撰写</td>
+                                <td>撰写 Agent</td>
+                                <td>调研 + 竞品 + 模板</td>
+                                <td>商业计划书.md</td>
+                                <td>—</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 子模块C：主动遗忘机制 -->
+                <div class="advanced-block">
+                    <div class="advanced-sub-title">🧹 C. 主动遗忘机制</div>
+                    <div class="forget-timeline">
+                        <div class="forget-item" onclick="openModal('forget-1')">
+                            <div class="forget-trigger">⏰ 30天未引用 → 标记休眠</div>
+                            <div class="forget-result">经验教训/工作日志条目退出召回，文件中保留</div>
+                        </div>
+                        <div class="forget-item" onclick="openModal('forget-2')">
+                            <div class="forget-trigger">📉 14天无引用（pending） → 自动废弃</div>
+                            <div class="forget-result">待确认条目移到 Archive，不参与 SoT 仲裁</div>
+                        </div>
+                        <div class="forget-item" onclick="openModal('forget-3')">
+                            <div class="forget-trigger">📦 300行超限 → 深度重构</div>
+                            <div class="forget-result">重组结构、合并章节、提取 TL;DR、归档废弃</div>
+                        </div>
+                        <div class="forget-item" onclick="openModal('forget-4')">
+                            <div class="forget-trigger">⚔️ 低等级被覆盖 → 自动降级</div>
+                            <div class="forget-result">被高等级信息覆盖的低等级条目标记为已废弃</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 文件结构 -->
+            <div class="section">
+                <div class="section-title">📁 生成的文件结构</div>
+                <div class="file-tree">
+                    <span class="folder">你的项目/</span><br>
+                    ├── <span class="file" onclick="openModal('file-agent')">agent.md</span> <span class="comment">← 项目全局规则</span><br>
+                    ├── <span class="file" onclick="openModal('file-memory')">memory.md</span> <span class="comment">← 记忆入口（目标栈+导航图）</span><br>
+                    ├── <span class="folder">memory/</span> <span class="comment">← 具体记忆文件</span><br>
+                    │   └── <span class="file" onclick="openModal('file-log')">log.md</span> <span class="comment">← 工作日志</span><br>
+                    └── <span class="folder">context/</span> <span class="comment">← 参考资料知识库</span><br>
+                        └── <span class="file" onclick="openModal('file-context')">README.md</span> <span class="comment">← 语料索引</span>
+                </div>
+                <div style="margin-top:12px;font-size:13px;color:#666;">
+                    💡 全部纯 Markdown 文件，完全可控，可编辑，可迁移
+                </div>
+            </div>
+
+            <!-- 技术选型对比 -->
+            <div class="section">
+                <div class="section-title">⚖️ 技术选型对比</div>
+                <table class="compare-table">
+                    <thead>
+                        <tr>
+                            <th>维度</th>
+                            <th>纯Markdown（本方案）</th>
+                            <th>向量数据库</th>
+                            <th>Notion / Obsidian</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr onclick="openModal('compare-1')">
+                            <td>部署门槛</td>
+                            <td><span class="compare-yes">✅ 零部署，文件即系统</span></td>
+                            <td><span class="compare-no">❌ 需部署DB+Embedding服务</span></td>
+                            <td><span class="compare-yes">✅ 注册即用</span></td>
+                        </tr>
+                        <tr onclick="openModal('compare-2')">
+                            <td>白盒可控</td>
+                            <td><span class="compare-yes">✅ 全部纯文本，完全可读</span></td>
+                            <td><span class="compare-no">❌ 向量黑盒，不可读</span></td>
+                            <td><span class="compare-partial">⚠️ 格式锁定，导出受限</span></td>
+                        </tr>
+                        <tr onclick="openModal('compare-3')">
+                            <td>工具迁移</td>
+                            <td><span class="compare-yes">✅ 复制文件夹即迁移</span></td>
+                            <td><span class="compare-no">❌ 绑定特定DB方案</span></td>
+                            <td><span class="compare-no">❌ 平台锁定，迁移成本高</span></td>
+                        </tr>
+                        <tr onclick="openModal('compare-4')">
+                            <td>AI原生设计</td>
+                            <td><span class="compare-yes">✅ 为AI召回设计的元数据+TL;DR</span></td>
+                            <td><span class="compare-yes">✅ 语义检索天然适配</span></td>
+                            <td><span class="compare-no">❌ 为人阅读设计，非AI召回</span></td>
+                        </tr>
+                        <tr onclick="openModal('compare-5')">
+                            <td>检索精度</td>
+                            <td><span class="compare-partial">⚠️ 导航图+三级加载，结构化精准</span></td>
+                            <td><span class="compare-yes">✅ 语义相似度检索强</span></td>
+                            <td><span class="compare-no">❌ 全文搜索，精度低</span></td>
+                        </tr>
+                        <tr onclick="openModal('compare-6')">
+                            <td>成本</td>
+                            <td><span class="compare-yes">✅ 零成本</span></td>
+                            <td><span class="compare-no">❌ DB+API持续费用</span></td>
+                            <td><span class="compare-partial">⚠️ 免费~付费不等</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 实际效果 -->
+            <div class="section">
+                <div class="section-title">📊 实际效果</div>
+                <div class="metrics">
+                    <div class="metric-card" onclick="openModal('metric-1')">
+                        <div class="metric-number">↓70%</div>
+                        <div class="metric-label">目标漂移率</div>
+                    </div>
+                    <div class="metric-card" onclick="openModal('metric-2')">
+                        <div class="metric-number">↓60%</div>
+                        <div class="metric-label">重复沟通次数</div>
+                    </div>
+                    <div class="metric-card" onclick="openModal('metric-3')">
+                        <div class="metric-number">0</div>
+                        <div class="metric-label">工具迁移成本</div>
+                    </div>
+                    <div class="metric-card" onclick="openModal('metric-4')">
+                        <div class="metric-number">3个月</div>
+                        <div class="metric-label">实际使用验证</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <p>🗣️ 触发词：搭建记忆系统 / 创建记忆文件 / 初始化记忆系统 / 优化记忆 / 重构记忆</p>
+        </div>
+    </div>
+    
+    <!-- 弹窗 -->
+    <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="modal-icon" id="modal-icon">📝</span>
+                    <span class="modal-title" id="modal-title">标题</span>
+                </div>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-content" id="modal-content">
+                内容
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const modalData = {
+            // 痛点
+            'pain-1': { icon: '🎯', title: '目标漂移', content: `
+                <p><strong>问题描述：</strong>用 AI 做项目时，聊到第 10 轮对话，AI 就忘了最开始设定的目标是什么。需要反复提醒，效率很低。</p>
+                <div class="highlight">
+                    <strong>典型场景：</strong><br>
+                    用户：帮我写一份产品方案，目标是解决用户留存问题<br>
+                    AI：好的，我来写...<br>
+                    （聊了几轮后）<br>
+                    AI：我建议增加社交功能，这样用户会更活跃<br>
+                    用户：等等，我们的目标是解决留存，不是增加活跃度！
+                </div>
+                <h3>解决方案</h3>
+                <p>通过「目标栈管理」功能，把目标拆成四层：</p>
+                <ul>
+                    <li>长期愿景 → 季度目标 → 阶段目标 → 当前任务</li>
+                    <li>AI 每次回复前都会对齐目标</li>
+                    <li>跑偏了会主动提醒用户</li>
+                </ul>
+            `},
+            'pain-2': { icon: '⚖️', title: '信息冲突', content: `
+                <p><strong>问题描述：</strong>同一个问题问两次，AI 给出的答案可能不一样。之前定好的规则，聊几轮就忘了。</p>
+                <div class="highlight">
+                    <strong>典型场景：</strong><br>
+                    用户：我的产品不要用第三方库<br>
+                    AI：好的，我记住了<br>
+                    （聊了几轮后）<br>
+                    AI：我建议使用 React 框架，因为...<br>
+                    用户：我之前说过不要用第三方库！
+                </div>
+                <h3>解决方案</h3>
+                <p>通过「SoT 权威层级」体系，明确信息优先级：</p>
+                <ul>
+                    <li>硬约束 > 项目背景 > 决策记录 > 经验教训</li>
+                    <li>高等级信息覆盖低等级信息</li>
+                    <li>信息冲突时有明确的仲裁规则</li>
+                </ul>
+            `},
+            'pain-3': { icon: '📁', title: '文件散落', content: `
+                <p><strong>问题描述：</strong>项目文件散落在各处，AI 找不到关键信息，需要用户手动整理和提供。</p>
+                <div class="highlight">
+                    <strong>典型场景：</strong><br>
+                    用户：帮我优化这个功能<br>
+                    AI：好的，请提供相关的需求文档、设计稿、技术方案...<br>
+                    用户：这些文件在不同的文件夹里，我找一下...
+                </div>
+                <h3>解决方案</h3>
+                <p>通过「结构化知识库」功能，自动组织项目文件：</p>
+                <ul>
+                    <li>所有参考资料统一存放在 <code>context/</code> 目录</li>
+                    <li>按类型分类：research/、meetings/、prd/、courses/、reference/</li>
+                    <li>自动生成索引，AI 可以按需检索</li>
+                </ul>
+            `},
+            'pain-4': { icon: '🔄', title: '工具绑定', content: `
+                <p><strong>问题描述：</strong>换个 AI 工具，之前的上下文全没了，得从头再来。被特定工具绑定，迁移成本高。</p>
+                <div class="highlight">
+                    <strong>典型场景：</strong><br>
+                    用户在 A 工具里做了一周的项目讨论 → 想换 B 工具 → 所有上下文都丢了 → 得重新说一遍
+                </div>
+                <h3>解决方案</h3>
+                <p>通过「白盒化设计」，确保可迁移性：</p>
+                <ul>
+                    <li>所有记忆文件都是纯 Markdown 格式</li>
+                    <li>没有任何专有格式锁定</li>
+                    <li>换任何支持本地文件的 AI 工具都能用</li>
+                    <li>直接把项目文件夹带过去就行</li>
+                </ul>
+            `},
+            
+            // 核心功能
+            'feature-1': { icon: '🎯', title: '目标栈管理', content: `
+                <p><strong>核心功能：</strong>把大目标拆成四层递进结构，AI 每次回复前先对齐目标，减少漂移。</p>
+                <h3>目标栈结构</h3>
+                <ul>
+                    <li><strong>长期愿景</strong>：项目的终极目标（如"成为行业领先的 AI 生产力工具"）</li>
+                    <li><strong>季度目标</strong>：当前季度要完成的关键指标</li>
+                    <li><strong>阶段目标</strong>：当前阶段的核心任务</li>
+                    <li><strong>当前任务</strong>：正在执行的具体任务</li>
+                </ul>
+                <div class="highlight">
+                    <strong>执行逻辑：</strong><br>
+                    1. AI 每次收到用户消息，先读取目标栈<br>
+                    2. 评估当前请求与目标栈的对齐度<br>
+                    3. 对齐 → 正常执行<br>
+                    4. 弱偏差 → 输出黄色提醒后执行<br>
+                    5. 强偏差 → 暂停，给出三个选项（切换/记录侧轨/取消）
+                </div>
+                <h3>目标栈更新规则</h3>
+                <ul>
+                    <li>用户明确说"更新目标""完成了""进入下一阶段"时更新</li>
+                    <li>AI 不能自己修改目标栈</li>
+                    <li>更新后自动记录到 <code>memory.md</code></li>
+                </ul>
+            `},
+            'feature-2': { icon: '⚖️', title: '信息冲突仲裁', content: `
+                <p><strong>核心功能：</strong>当不同来源的信息发生冲突时，按权威层级自动仲裁，确保 AI 的决策有明确依据。</p>
+                <h3>SoT 权威层级</h3>
+                <ul>
+                    <li><strong>L0 - 硬约束</strong>：红线规则，绝对不能违反</li>
+                    <li><strong>L1 - 项目背景</strong>：项目的核心定位和目标</li>
+                    <li><strong>L2 - 决策记录</strong>：已经做出的重要决策（必须包含原因）</li>
+                    <li><strong>L3 - 经验教训</strong>：之前踩过的坑和总结的经验</li>
+                    <li><strong>L4 - 流程规范</strong>：工作流程和规范</li>
+                    <li><strong>L5 - 工作日志</strong>：日常工作记录</li>
+                    <li><strong>L6 - 参考资料</strong>：外部参考，最低权威</li>
+                </ul>
+                <div class="highlight">
+                    <strong>仲裁规则：</strong><br>
+                    - 高等级有效条目 > 低等级有效条目<br>
+                    - 同等级：更新时间更近的优先<br>
+                    - 待确认条目不能覆盖有效条目<br>
+                    - 已废弃条目不参与仲裁<br>
+                    - 无法仲裁时，告知用户并请求确认
+                </div>
+                <div class="tip">
+                    💡 <strong>注意：</strong>决策记录必须包含原因。只记"做了什么"而不记"为什么"，等于没记。
+                </div>
+            `},
+            'feature-3': { icon: '📚', title: '三级加载机制', content: `
+                <p><strong>核心功能：</strong>根据任务需求，分三级加载记忆内容，合理使用 Token，提升效率。</p>
+                <h3>三级加载策略</h3>
+                <ul>
+                    <li><strong>L1 - 摘要加载</strong>：先看 TL;DR + 元数据，快速了解概览（≤500 tokens）</li>
+                    <li><strong>L2 - 片段加载</strong>：如果相关，读取相关章节/条目（≤2000 tokens）</li>
+                    <li><strong>L3 - 全文加载</strong>：需要精确信息时才读完整文件内容</li>
+                </ul>
+                <h3>加载流程</h3>
+                <div class="highlight">
+                    <strong>会话开始：</strong><br>
+                    1. L3 加载 <code>memory.md</code>（全文，因为它是索引）<br>
+                    2. 根据任务类型，从"任务类型→召回预设"表确定初始文件集<br>
+                    3. L1 加载初始文件集的 TL;DR
+                </div>
+                <div class="highlight">
+                    <strong>任务执行中：</strong><br>
+                    1. 首次读取任意文件 → L1<br>
+                    2. 判断相关性 → 相关则升级到 L2<br>
+                    3. 需要精确措辞/发现冲突/深度执行 → 升级到 L3
+                </div>
+                <h3>Token 预算管理</h3>
+                <ul>
+                    <li>内部估算已加载的 token 数量</li>
+                    <li>接近上下文限制时，优先保留 P0/P1 文件的 L2</li>
+                    <li>低优先级文件降级为 L1</li>
+                </ul>
+            `},
+            'feature-4': { icon: '🔄', title: '主动更新记忆', content: `
+                <p><strong>核心功能：</strong>不需要用户每次说"帮我记一下"，系统会主动记录重要信息。</p>
+                <h3>主动更新场景</h3>
+                <ul>
+                    <li><strong>里程碑完成后（主动提议）：</strong><br>
+                        <code>[Memory Update Proposal] 我计划记录"XX功能已完成"到决策记录。原因：这是关键里程碑。若无异议将自动记录。</code><br>
+                        用户不反对 → 写入；用户反对 → 不写或调整</li>
+                    <li><strong>AI 犯错被纠正（即时记录）：</strong><br>
+                        立即写入经验教训（状态为待确认）</li>
+                    <li><strong>AI 做了决策（即时记录）：</strong><br>
+                        写入决策记录，包含备选方案</li>
+                    <li><strong>发现新约束（即时记录）：</strong><br>
+                        写入对应文件（状态为待确认）</li>
+                    <li><strong>新建文件（即时更新）：</strong><br>
+                        立即更新 <code>memory.md</code> 中的索引</li>
+                </ul>
+                <h3>不自动记录的情况</h3>
+                <ul>
+                    <li>纯粹的讨论/闲聊</li>
+                    <li>用户明确说"不要记录"</li>
+                    <li>临时信息（如"今天先到这里"）</li>
+                </ul>
+                <div class="tip">
+                    💡 <strong>设计原则：</strong>只追加，不删除/修改（除非用户明确请求）。默认状态为待确认。
+                </div>
+            `},
+            'feature-5': { icon: '♻️', title: '生命周期管理', content: `
+                <p><strong>核心功能：</strong>记忆不是存进去就完了，需要定期维护和清理，保证质量。</p>
+                <h3>记忆状态</h3>
+                <ul>
+                    <li><strong>有效</strong>：用户确认过的可靠信息</li>
+                    <li><strong>待确认</strong>：AI 自动记录的信息，需要用户确认</li>
+                    <li><strong>已废弃</strong>：过时或被新信息取代的内容</li>
+                </ul>
+                <h3>生命周期流程</h3>
+                <div class="highlight">
+                    <strong>写入前检查：</strong><br>
+                    1. 检查目标文件是否存在<br>
+                    2. 扫描现有内容，检查是否重复或冲突<br>
+                    3. 冲突 → 执行 SoT 仲裁流程<br>
+                    4. 重复 → 合并而非追加
+                </div>
+                <div class="highlight">
+                    <strong>写入时：</strong><br>
+                    1. 自动添加状态（自动记录初始为待确认）<br>
+                    2. 添加日期标记<br>
+                    3. 更新文件元数据的 last_updated
+                </div>
+                <div class="highlight">
+                    <strong>写入后检查：</strong><br>
+                    1. 文件超过 200 行 → 立即执行去重/合并/归档<br>
+                    2. 更新 <code>memory.md</code> 中的索引状态
+                </div>
+                <h3>状态转换规则</h3>
+                <ul>
+                    <li>待确认 → 有效：用户明确确认，或后续引用无异议</li>
+                    <li>待确认超过 7 天 → 在检查点提醒用户</li>
+                    <li>已废弃：新信息替换旧信息，或用户明确说不再需要</li>
+                    <li>已废弃条目 → 移到文件末尾的"Archive"部分</li>
+                </ul>
+            `},
+            'feature-6': { icon: '🔇', title: '信息降噪', content: `
+                <p><strong>核心功能：</strong>在信息进入记忆前进行过滤，确保只有有价值的信息才被写入。</p>
+                <h3>过滤流程</h3>
+                <ul>
+                    <li><strong>语义判断</strong>：事实/决策/经验/约束 vs 情绪/重复/口头禅</li>
+                    <li><strong>角色判断</strong>：用户明确表述 / AI 推断 / 外部参考资料</li>
+                    <li><strong>重要性评分</strong>：1-5 分，低于 3 分不写入</li>
+                    <li><strong>去重检查</strong>：与已有记忆比对，重复则合并而非追加</li>
+                </ul>
+                <h3>噪音类型</h3>
+                <ul>
+                    <li>重复提问（同样的问题反复问）</li>
+                    <li>情绪表达（吐槽、抱怨、感叹）</li>
+                    <li>口头禅（"那个"、"就是说"等）</li>
+                    <li>临时信息（"今天先到这里"等）</li>
+                </ul>
+                <div class="highlight">
+                    <strong>关键规则：</strong>禁止用关键词匹配做降噪（会误判"帮我查订单状态"中的"状态"），必须用语义理解。
+                </div>
+                <div class="highlight">
+                    <strong>典型场景：</strong>客服 Agent 把每句"产品多少钱"都原封不动传给大模型，上下文被重复信息占满。
+                </div>
+                <div class="tip">
+                    💡 <strong>降噪不是删除，是在入记忆前做取舍。</strong>
+                </div>
+            `},
+            'feature-7': { icon: '🔗', title: '任务接力', content: `
+                <p><strong>核心功能：</strong>复杂任务拆解为子任务，每个子任务上下文隔离，通过交付物传递结果。</p>
+                <h3>拆解规则</h3>
+                <ul>
+                    <li>每个子任务只加载所需记忆文件，不继承前序全部对话</li>
+                    <li>完成后将产出写入 <code>memory/</code>，下一个 Agent 读取产出而非全部历史</li>
+                </ul>
+                <h3>错误隔离</h3>
+                <ul>
+                    <li>子任务失败只回滚自身，不影响其他子任务</li>
+                    <li>失败原因写入经验教训，供后续子任务参考</li>
+                </ul>
+                <h3>上下文交接格式</h3>
+                <div class="highlight">
+                    <strong>交接内容：</strong><br>
+                    1. 交付物摘要（已完成什么、关键结论）<br>
+                    2. 关键约束（必须遵守的规则、不能触碰的红线）<br>
+                    3. 需加载文件列表（下一步该读哪些文件）
+                </div>
+                <div class="highlight">
+                    <strong>典型场景：</strong>写商业计划书拆为：市场调研 → 竞品分析 → 方案撰写，每步独立上下文。
+                </div>
+                <div class="tip">
+                    💡 <strong>接力的核心是"传产出不传对话"。</strong>
+                </div>
+            `},
+            'feature-8': { icon: '🧹', title: '主动遗忘', content: `
+                <p><strong>核心功能：</strong>基于时间衰减和使用频率的主动遗忘机制，保持活跃记忆精简。</p>
+                <h3>遗忘触发</h3>
+                <ul>
+                    <li><strong>时间衰减</strong>：30 天未引用 → 休眠</li>
+                    <li><strong>频率衰减</strong>：pending 14 天 0 引用 → 废弃</li>
+                    <li><strong>容量阈值</strong>：300 行 → 深度重构</li>
+                    <li><strong>冲突淘汰</strong>：低等级被覆盖 → 自动降级</li>
+                </ul>
+                <h3>休眠条目</h3>
+                <ul>
+                    <li>不参与召回，但保留在文件中</li>
+                    <li>用户可通过 <code>recall</code> 命令重新激活</li>
+                </ul>
+                <h3>每月遗忘报告</h3>
+                <ul>
+                    <li>每月 1 号输出被遗忘/休眠的条目摘要</li>
+                    <li>用户可一键恢复任意条目</li>
+                </ul>
+                <div class="highlight">
+                    <strong>核心理念：</strong>记忆不是只增不减的，不遗忘的记忆最终会变成噪音。
+                </div>
+                <div class="tip">
+                    💡 <strong>休眠 ≠ 删除，用户随时可以唤醒。</strong>
+                </div>
+            `},
+
+            // 四层架构
+            'layer-1': { icon: '🧠', title: 'L1 - 工作记忆', content: `
+                <p><strong>定义：</strong>当前会话的临时上下文，相当于人类大脑的短期记忆。</p>
+                <h3>内容特点</h3>
+                <ul>
+                    <li><strong>临时性</strong>：只在当前会话有效，会话结束后消失</li>
+                    <li><strong>任务级</strong>：围绕当前正在执行的任务展开</li>
+                    <li><strong>实时性</strong>：随着对话推进不断更新</li>
+                </ul>
+                <h3>在系统中的作用</h3>
+                <ul>
+                    <li>存储当前对话的上下文</li>
+                    <li>追踪当前任务的进度</li>
+                    <li>记录当前的侧轨待办</li>
+                </ul>
+                <div class="tip">
+                    💡 <strong>类比：</strong>就像你正在做一道菜，工作记忆就是你手上正在处理的食材和步骤。一旦做完，这些临时信息就不需要了。
+                </div>
+            `},
+            'layer-2': { icon: '📋', title: 'L2 - 项目记忆', content: `
+                <p><strong>定义：</strong>项目级别的核心记忆，包含目标栈、决策记录、经验教训、流程规范等。</p>
+                <h3>核心文件</h3>
+                <ul>
+                    <li><strong>memory.md</strong>：记忆入口，包含目标栈、导航图、召回预设</li>
+                    <li><strong>agent.md</strong>：项目全局规则（目标对齐/检查点/自动更新）</li>
+                    <li><strong>memory/log.md</strong>：工作日志</li>
+                </ul>
+                <h3>内容特点</h3>
+                <ul>
+                    <li><strong>持久性</strong>：跨会话存在，直到项目结束</li>
+                    <li><strong>权威性</strong>：SoT 层级中的核心部分</li>
+                    <li><strong>结构化</strong>：有明确的格式规范和元数据</li>
+                </ul>
+                <div class="tip">
+                    💡 <strong>类比：</strong>就像一个项目的"作战手册"，包含目标、策略、规则、经验，所有人都要遵守。
+                </div>
+            `},
+            'layer-3': { icon: '💡', title: 'L3 - 知识记忆', content: `
+                <p><strong>定义：</strong>用户级别的长期记忆，跨项目共享，包含用户偏好、领域知识、跨项目经验等。</p>
+                <h3>核心文件</h3>
+                <ul>
+                    <li><strong>agent.md</strong>（用户级）：跨项目通用规则和角色设定</li>
+                    <li><strong>preferences.md</strong>：用户偏好（语言、输出风格、交互方式）</li>
+                    <li><strong>knowledge.md</strong>：领域知识和专业技能</li>
+                    <li><strong>lessons-learned.md</strong>：跨项目的通用经验教训</li>
+                </ul>
+                <h3>关键规则</h3>
+                <div class="highlight">
+                    <strong>项目规则优先：</strong><br>
+                    用户级记忆的 SoT 级别在用户空间内有效，但<strong>不参与项目级 SoT 仲裁</strong>。项目规则（L0-L5）永远优先于个人偏好。
+                </div>
+                <div class="tip">
+                    💡 <strong>类比：</strong>就像你的"个人知识库"，包含你的专业知识、工作习惯、偏好设定，所有项目都可以参考。
+                </div>
+            `},
+            'layer-4': { icon: '📖', title: 'L4 - 语料库', content: `
+                <p><strong>定义：</strong>项目相关的参考资料全文，按类型分类存储，按需检索。</p>
+                <h3>目录结构</h3>
+                <ul>
+                    <li><strong>context/research/</strong>：研究报告、市场调研</li>
+                    <li><strong>context/meetings/</strong>：会议纪要、讨论记录</li>
+                    <li><strong>context/prd/</strong>：需求文档、产品规格</li>
+                    <li><strong>context/courses/</strong>：课程笔记、学习资料</li>
+                    <li><strong>context/reference/</strong>：技术文档、参考手册</li>
+                </ul>
+                <h3>与记忆系统的区别</h3>
+                <div class="highlight">
+                    <strong>记忆（memory/）：</strong><br>
+                    提炼后的规则、决策、经验；按需注入任务；SoT L0-L5
+                </div>
+                <div class="highlight">
+                    <strong>语料（context/）：</strong><br>
+                    原始参考资料全文和结构化摘要；只在需要时检索；SoT L6（最低权威）
+                </div>
+                <h3>使用方法</h3>
+                <ul>
+                    <li>将 PPT/Word/PDF/网页等材料转换为 MD 文件</li>
+                    <li>放入对应子目录</li>
+                    <li>AI 自动更新 <code>context/README.md</code> 索引</li>
+                    <li>召回时先读索引（L1），判断相关性后再读具体文件</li>
+                </ul>
+            `},
+            
+            // SoT 层级
+            'sot-0': { icon: '🔴', title: 'L0 - 硬约束', content: `
+                <p><strong>定义：</strong>红线规则，绝对不能违反的约束条件。</p>
+                <h3>典型内容</h3>
+                <ul>
+                    <li>技术栈限制（如"不能使用第三方库"）</li>
+                    <li>合规要求（如"必须遵守 GDPR"）</li>
+                    <li>品牌规范（如"必须使用品牌色调"）</li>
+                    <li>安全红线（如"不能存储明文密码"）</li>
+                </ul>
+                <div class="tip">
+                    ⚠️ <strong>最高权威：</strong>L0 级别的信息优先级最高，任何其他级别的信息都不能覆盖它。
+                </div>
+            `},
+            'sot-1': { icon: '🟠', title: 'L1 - 项目背景与目标', content: `
+                <p><strong>定义：</strong>项目的核心定位、目标和背景信息。</p>
+                <h3>典型内容</h3>
+                <ul>
+                    <li>项目愿景和使命</li>
+                    <li>核心目标和关键指标</li>
+                    <li>目标用户和使用场景</li>
+                    <li>项目背景和由来</li>
+                </ul>
+                <div class="tip">
+                    🎯 <strong>指南针：</strong>L1 是项目的指南针，所有决策都应该对齐这些目标。
+                </div>
+            `},
+            'sot-2': { icon: '🟡', title: 'L2 - 决策记录', content: `
+                <p><strong>定义：</strong>已经做出的重要决策，必须包含决策原因。</p>
+                <h3>典型内容</h3>
+                <ul>
+                    <li>技术选型决策（如"选择 React 而非 Vue，因为团队更熟悉"）</li>
+                    <li>产品设计决策（如"采用深色模式，因为目标用户是夜间工作者"）</li>
+                    <li>优先级决策（如"先做功能 A，后做功能 B，因为 A 的用户价值更高"）</li>
+                </ul>
+                <div class="tip">
+                    📝 <strong>必须记录原因：</strong>只记"做了什么"而不记"为什么"，等于没记。原因是未来复盘和理解的关键。
+                </div>
+            `},
+            'sot-3': { icon: '🟢', title: 'L3 - 经验教训', content: `
+                <p><strong>定义：</strong>之前踩过的坑和总结的经验，作为后续工作的参考。</p>
+                <h3>典型内容</h3>
+                <ul>
+                    <li>反模式（如"不要在循环中调用 API"）</li>
+                    <li>最佳实践（如"先做原型验证再开发"）</li>
+                    <li>常见错误（如"忘记处理边界情况"）</li>
+                    <li>成功经验（如"用 A/B 测试验证假设"）</li>
+                </ul>
+                <div class="tip">
+                    💡 <strong>预执行检查：</strong>AI 在执行每个步骤前，会扫描相关的经验教训，避免重复踩坑。
+                </div>
+            `},
+            'sot-4': { icon: '🔵', title: 'L4 - 流程规范', content: `
+                <p><strong>定义：</strong>工作流程和规范，确保团队协作的一致性。</p>
+                <h3>典型内容</h3>
+                <ul>
+                    <li>开发流程（如"需求评审 → 设计 → 开发 → 测试 → 上线"）</li>
+                    <li>代码规范（如"使用 ESLint 检查代码质量"）</li>
+                    <li>协作规范（如"每日站会同步进度"）</li>
+                    <li>文档规范（如"每个功能需要写设计文档"）</li>
+                </ul>
+            `},
+            'sot-5': { icon: '🟣', title: 'L5 - 工作日志', content: `
+                <p><strong>定义：</strong>日常工作记录，追踪进度和待办。</p>
+                <h3>典型内容</h3>
+                <ul>
+                    <li>每日/每周工作进展</li>
+                    <li>待办事项列表</li>
+                    <li>问题和阻塞点</li>
+                    <li>临时笔记和想法</li>
+                </ul>
+                <div class="tip">
+                    📅 <strong>灵活配置：</strong>支持多种日志格式（单文件、按天、按月），按用户习惯选择。
+                </div>
+            `},
+            'sot-6': { icon: '⚫', title: 'L6 - 参考资料', content: `
+                <p><strong>定义：</strong>外部参考资料，权威级别最低。</p>
+                <h3>典型内容</h3>
+                <ul>
+                    <li>技术文档和手册</li>
+                    <li>行业报告和分析</li>
+                    <li>竞品分析和案例</li>
+                    <li>学习资料和教程</li>
+                </ul>
+                <div class="tip">
+                    📚 <strong>最低权威：</strong>L6 级别的信息不能覆盖任何更高等级的信息。当与其他信息冲突时，以更高等级为准。
+                </div>
+            `},
+            
+            // 三级加载
+            'loading-1': { icon: '📄', title: 'L1 - 摘要加载', content: `
+                <p><strong>定义：</strong>只加载文件的 TL;DR（摘要）和元数据，快速了解文件内容。</p>
+                <h3>加载内容</h3>
+                <ul>
+                    <li>TL;DR（2-3 句话的摘要）</li>
+                    <li>元数据表（更新时间、SoT 级别、作用范围、状态）</li>
+                    <li>章节标题（用于判断相关性）</li>
+                </ul>
+                <h3>使用场景</h3>
+                <ul>
+                    <li>会话开始时，快速浏览所有相关文件</li>
+                    <li>判断文件是否与当前任务相关</li>
+                    <li>获取文件的基本信息</li>
+                </ul>
+                <div class="tip">
+                    🚀 <strong>快速高效：</strong>L1 加载量 ≤500 tokens，非常节省资源。
+                </div>
+            `},
+            'loading-2': { icon: '📑', title: 'L2 - 片段加载', content: `
+                <p><strong>定义：</strong>加载与当前任务相关的章节或条目，不加载完整文件。</p>
+                <h3>加载内容</h3>
+                <ul>
+                    <li>与当前任务相关的章节全文</li>
+                    <li>相关的决策记录或经验教训条目</li>
+                    <li>关键数据和具体内容</li>
+                </ul>
+                <h3>使用场景</h3>
+                <ul>
+                    <li>L1 判断文件相关后，深入了解具体内容</li>
+                    <li>需要具体规则或决策细节</li>
+                    <li>不需要完整文件，但需要部分详细内容</li>
+                </ul>
+                <div class="tip">
+                    ⚖️ <strong>平衡效率与深度：</strong>L2 加载量 ≤2000 tokens，既获取了足够信息，又不浪费资源。
+                </div>
+            `},
+            'loading-3': { icon: '📖', title: 'L3 - 全文加载', content: `
+                <p><strong>定义：</strong>加载文件的完整内容，用于需要精确信息的场景。</p>
+                <h3>加载内容</h3>
+                <ul>
+                    <li>文件的全部正文内容</li>
+                    <li>所有章节和条目</li>
+                    <li>完整的上下文信息</li>
+                </ul>
+                <h3>使用场景</h3>
+                <ul>
+                    <li>需要精确措辞或引用</li>
+                    <li>发现信息冲突，需要完整上下文来仲裁</li>
+                    <li>深度任务，需要全面了解文件内容</li>
+                    <li>首次加载 <code>memory.md</code>（因为它是索引）</li>
+                </ul>
+                <div class="tip">
+                    ⚠️ <strong>按需使用：</strong>L3 加载消耗较多 tokens，只在必要时使用。
+                </div>
+            `},
+
+            // 记忆管理进阶机制 - 信息降噪
+            'denoise-1': { icon: '🔍', title: '语义判断', content: `
+                <p>判断信息是<strong>事实/决策/经验/约束</strong>，还是<strong>情绪表达/重复询问/口头禅</strong>。这是降噪的第一道关，决定信息是否值得进入记忆。</p>
+                <div class="tip">
+                    💡 <strong>关键：</strong>必须用语义理解而非关键词匹配，否则会误判"帮我查订单状态"中的"状态"为口头禅。
+                </div>
+            `},
+            'denoise-2': { icon: '👤', title: '角色判断', content: `
+                <p>判断信息来源：</p>
+                <ul>
+                    <li><strong>用户明确表述</strong>：可信度最高，可直接进入记忆</li>
+                    <li><strong>AI 推断</strong>：需标记为"待确认"，不能直接覆盖用户表述</li>
+                    <li><strong>外部参考资料</strong>：标注来源和日期，SoT 级别较低</li>
+                </ul>
+                <p>不同来源影响信息的可信度和 SoT 级别。</p>
+            `},
+            'denoise-3': { icon: '⭐', title: '重要性评分', content: `
+                <p>1-5 分评估信息重要性：</p>
+                <ul>
+                    <li><strong>1-2 分（琐碎/临时）</strong>：→ 丢弃，不进入记忆</li>
+                    <li><strong>3 分（一般事实）</strong>：→ 待确认写入</li>
+                    <li><strong>4-5 分（关键决策/经验）</strong>：→ 立即写入</li>
+                </ul>
+                <div class="highlight">
+                    <strong>规则：</strong>低于 3 分的信息不进入记忆，避免噪音污染。
+                </div>
+            `},
+
+            // 记忆管理进阶机制 - 任务接力
+            'relay-row': { icon: '🔗', title: '任务接力表', content: `
+                <p>当任务超出单次上下文容量时，拆解为子任务并接力执行：</p>
+                <ul>
+                    <li>每个子任务有<strong>独立的上下文范围</strong>（只加载相关记忆文件）</li>
+                    <li>完成后将<strong>交付物</strong>写入 <code>memory/</code>，下一个子任务读取交付物而非历史对话</li>
+                    <li><strong>错误隔离</strong>：单个子任务失败不影响其他子任务</li>
+                </ul>
+                <h3>交接格式</h3>
+                <div class="highlight">
+                    <strong>交付物摘要</strong> + <strong>关键约束</strong> + <strong>需加载文件列表</strong>
+                </div>
+                <div class="tip">
+                    💡 <strong>接力的核心是"传产出不传对话"。</strong>
+                </div>
+            `},
+
+            // 记忆管理进阶机制 - 主动遗忘
+            'forget-1': { icon: '⏰', title: '时间衰减', content: `
+                <p>超过 <strong>30 天</strong>未被引用的"经验教训"和"工作日志"条目标记为<strong>"休眠"</strong>。</p>
+                <ul>
+                    <li>休眠条目不参与召回</li>
+                    <li>但保留在文件中，不删除</li>
+                    <li>用户可通过 <code>recall</code> 命令重新激活</li>
+                </ul>
+                <div class="tip">
+                    💡 <strong>休眠 ≠ 删除</strong>，是为了让活跃记忆保持精简。
+                </div>
+            `},
+            'forget-2': { icon: '📉', title: '频率衰减', content: `
+                <p>被引用 <strong>0 次</strong>且超过 <strong>14 天</strong>的"待确认"条目自动转为<strong>"已废弃"</strong>。</p>
+                <ul>
+                    <li>已废弃条目移到文件末尾 Archive 部分</li>
+                    <li>不参与 SoT 仲裁</li>
+                    <li>不影响活跃记忆的召回</li>
+                </ul>
+                <div class="tip">
+                    💡 这是对"待确认"状态的兜底处理，避免长期未确认的条目堆积。
+                </div>
+            `},
+            'forget-3': { icon: '📦', title: '容量阈值', content: `
+                <p>单文件超过 <strong>300 行</strong>触发<strong>深度重构</strong>：</p>
+                <ul>
+                    <li>不只是去重，而是重组整个文件结构</li>
+                    <li>合并相关章节</li>
+                    <li>提取新的 TL;DR</li>
+                    <li>归档废弃条目到 Archive</li>
+                </ul>
+                <div class="highlight">
+                    <strong>目标：</strong>活跃区域 ≤ 200 行，保证召回效率。
+                </div>
+            `},
+            'forget-4': { icon: '⚔️', title: '冲突淘汰', content: `
+                <p>被高等级信息覆盖的低等级信息自动标记为<strong>"已废弃"</strong>。</p>
+                <div class="highlight">
+                    <strong>示例：</strong>决策记录（L2）与参考资料（L6）冲突时，L6 的信息自动降级为已废弃，以 L2 决策为准。
+                </div>
+                <div class="tip">
+                    💡 这是 SoT 仲裁机制的自动执行，保证记忆系统内部一致性。
+                </div>
+            `},
+
+            // 文件结构
+            'file-agent': { icon: '🤖', title: 'agent.md', content: `
+                <p><strong>作用：</strong>项目全局规则文件，定义 AI 在该项目中的行为规范。</p>
+                <h3>核心内容</h3>
+                <ul>
+                    <li><strong>目标对齐规则</strong>：如何检查当前任务与目标栈的对齐度</li>
+                    <li><strong>检查点规则</strong>：何时输出进度检查点，格式要求</li>
+                    <li><strong>自动更新规则</strong>：何时主动提议记录，何时立即记录</li>
+                    <li><strong>召回规则</strong>：不同任务类型应该加载哪些记忆文件</li>
+                    <li><strong>防污染规则</strong>：禁止出现的信息类型</li>
+                </ul>
+                <div class="tip">
+                    📋 <strong>AI 的行为准则：</strong>AI 在项目中做任何事情，都应该遵守 <code>agent.md</code> 中的规则。
+                </div>
+            `},
+            'file-memory': { icon: '🧠', title: 'memory.md', content: `
+                <p><strong>作用：</strong>记忆系统的入口文件，包含目标栈、导航图、召回预设等核心信息。</p>
+                <h3>核心内容</h3>
+                <ul>
+                    <li><strong>目标栈</strong>：长期愿景 → 季度目标 → 阶段目标 → 当前任务</li>
+                    <li><strong>导航图</strong>：告诉 AI "什么时候读什么文件，读到什么程度"</li>
+                    <li><strong>召回预设</strong>：任务类型与记忆文件的映射表</li>
+                    <li><strong>记忆文件索引</strong>：所有记忆文件的列表和状态</li>
+                </ul>
+                <div class="tip">
+                    🚪 <strong>记忆入口：</strong>AI 在会话开始时，总是先读取 <code>memory.md</code>（L3 全文），然后根据它来决定加载哪些其他文件。
+                </div>
+            `},
+            'file-log': { icon: '📅', title: 'memory/log.md', content: `
+                <p><strong>作用：</strong>工作日志，记录每日工作进展、决策和待办。</p>
+                <h3>核心内容</h3>
+                <ul>
+                    <li>日期标记</li>
+                    <li>工作进展</li>
+                    <li>决策记录</li>
+                    <li>待办事项</li>
+                    <li>问题和阻塞点</li>
+                </ul>
+                <h3>格式选择</h3>
+                <ul>
+                    <li><strong>单文件（推荐）：</strong>所有日志都在一个文件中，按时间倒序追加</li>
+                    <li><strong>按天：</strong>每天一个文件</li>
+                    <li><strong>按月：</strong>每月一个文件</li>
+                </ul>
+                <div class="tip">
+                    💡 <strong>不强制每天一个文件：</strong>每个人的使用习惯不同，舒适是第一位的。
+                </div>
+            `},
+            'file-context': { icon: '📚', title: 'context/README.md', content: `
+                <p><strong>作用：</strong>语料库的总索引，自动维护，记录所有参考资料的信息。</p>
+                <h3>核心内容</h3>
+                <ul>
+                    <li><strong>与记忆系统的区别</strong>：记忆是提炼后的规则，语料是原始参考资料</li>
+                    <li><strong>分类索引</strong>：按 research/、meetings/、prd/、courses/、reference/ 分类</li>
+                    <li><strong>文件列表</strong>：每个文件的标签、置信度、摘要、日期</li>
+                </ul>
+                <h3>使用方法</h3>
+                <ul>
+                    <li>将材料转换为 MD 文件，放入对应子目录</li>
+                    <li>AI 自动更新此索引</li>
+                    <li>召回时先读索引（L1），判断相关性后再读具体文件</li>
+                </ul>
+            `},
+
+            // 新增痛点
+            'pain-5': { icon: '📦', title: '上下文膨胀', content: `
+                <p><strong>问题描述：</strong>垃圾信息、重复对话、口头禅不断积累，占满上下文窗口，关键信息被挤掉，AI 性能急剧下降。</p>
+                <div class="highlight">
+                    <strong>典型场景：</strong><br>
+                    客服 Agent 把每句"产品多少钱"都原封不动传给大模型 → 10 轮对话后上下文被重复信息占满 → 真正关键的问题反而处理不了
+                </div>
+                <h3>解决方案</h3>
+                <p>通过「信息降噪层」在入记忆前过滤噪音：</p>
+                <ul>
+                    <li>语义判断：是事实/决策/经验，还是情绪/重复/口头禅？</li>
+                    <li>重要性评分：1-5 分，低于 3 分不写入</li>
+                    <li>禁止用关键词匹配（会误判"查订单状态"中的"状态"）</li>
+                </ul>
+            `},
+            'pain-6': { icon: '🗑️', title: '记忆堆积', content: `
+                <p><strong>问题描述：</strong>信息只增不减，过期记忆、被推翻的决策、过时的经验还留在活跃区域，变成噪音干扰 AI 决策。</p>
+                <div class="highlight">
+                    <strong>典型场景：</strong><br>
+                    项目初期的技术选型决策已经改了 3 次，但旧决策还留在记忆里 → AI 引用时可能引用到已废弃的决策 → 输出矛盾结果
+                </div>
+                <h3>解决方案</h3>
+                <p>通过「主动遗忘机制」自动清理过期记忆：</p>
+                <ul>
+                    <li>时间衰减：30 天未引用 → 休眠</li>
+                    <li>频率衰减：pending 14 天 0 引用 → 废弃</li>
+                    <li>冲突淘汰：低等级被覆盖 → 自动降级</li>
+                    <li>休眠 ≠ 删除，用户可随时 recall 唤醒</li>
+                </ul>
+            `},
+
+            // 技术选型对比
+            'compare-1': { icon: '🚀', title: '部署门槛', content: `
+                <p><strong>纯 Markdown（本方案）：</strong>零部署，创建文件即系统就绪。用户不需要安装任何数据库、不需要配置 Embedding 服务，只需要一个能读写文件的 AI 工具。</p>
+                <p><strong>向量数据库：</strong>需要部署向量数据库（如 Pinecone、Milvus），还需要配置 Embedding 模型服务，对非技术用户门槛极高。</p>
+                <p><strong>Notion / Obsidian：</strong>注册即用，门槛最低，但受限于平台功能。</p>
+                <div class="tip">💡 本方案的零部署特性，让任何项目的 AI 协作都能立即用上记忆系统。</div>
+            `},
+            'compare-2': { icon: '🔍', title: '白盒可控', content: `
+                <p><strong>纯 Markdown：</strong>所有记忆内容都是纯文本，用户可以直接打开阅读、编辑、删除。完全透明，完全可控。</p>
+                <p><strong>向量数据库：</strong>数据以向量形式存储，人类不可读。用户无法直接查看或修改记忆内容，是典型的黑盒系统。</p>
+                <p><strong>Notion / Obsidian：</strong>内容可读，但格式被平台锁定（Notion 的 block 结构、Obsidian 的双链语法），导出时可能丢失结构信息。</p>
+                <div class="tip">💡 白盒可控是本方案的核心设计原则：工具可替换，资产不可替换。</div>
+            `},
+            'compare-3': { icon: '🔄', title: '工具迁移', content: `
+                <p><strong>纯 Markdown：</strong>复制文件夹到新工具的目录即可完成迁移。因为是纯文本，任何支持本地文件的 AI 工具都能直接使用。</p>
+                <p><strong>向量数据库：</strong>绑定特定的数据库方案和 Embedding 模型，换方案需要重新向量化所有数据，迁移成本极高。</p>
+                <p><strong>Notion / Obsidian：</strong>平台锁定严重。Notion 导出 Markdown 会丢失大量结构，Obsidian 虽然本地存储但双链语法在其他工具中不通用。</p>
+                <div class="highlight"><strong>迁移成本对比：</strong>本方案 = 复制粘贴；向量DB = 重新部署+重新向量化；Notion = 手动清理格式</div>
+            `},
+            'compare-4': { icon: '🤖', title: 'AI 原生设计', content: `
+                <p><strong>纯 Markdown（本方案）：</strong>每个文件都有 TL;DR（供 L1 快速判断）、元数据表（SoT 级别/状态/更新时间）、导航图（告诉 AI 什么时候读什么）。是为 AI 召回专门设计的结构。</p>
+                <p><strong>向量数据库：</strong>语义检索天然适配 AI，但缺乏结构化的权威层级和目标锚定机制。</p>
+                <p><strong>Notion / Obsidian：</strong>为人阅读和组织设计，没有 AI 召回所需的元数据、加载级别、权威层级等概念。</p>
+                <div class="tip">💡 这是本方案与传统知识管理工具的本质区别：不是给人用的笔记，是给 AI 用的记忆。</div>
+            `},
+            'compare-5': { icon: '🎯', title: '检索精度', content: `
+                <p><strong>纯 Markdown（本方案）：</strong>通过导航图 + 三级加载 + SoT 路由链实现结构化精准检索。AI 知道"什么时候读什么文件，读到什么程度"。</p>
+                <p><strong>向量数据库：</strong>语义相似度检索能力强，适合模糊匹配，但可能召回语义相近但权威性低的信息，缺少冲突仲裁机制。</p>
+                <p><strong>Notion / Obsidian：</strong>全文搜索，精度低，无法区分信息权威性，也没有分级加载机制。</p>
+                <div class="highlight"><strong>本方案优势：</strong>SoT 权威层级确保高权威信息覆盖低权威信息，避免"参考资料覆盖决策记录"的问题。</div>
+            `},
+            'compare-6': { icon: '💰', title: '成本', content: `
+                <p><strong>纯 Markdown：</strong>零成本。纯文件存储，不需要任何 API 调用费用或数据库订阅费用。</p>
+                <p><strong>向量数据库：</strong>持续费用。数据库托管费 + Embedding API 调用费 + 查询 API 费用，随数据量增长。</p>
+                <p><strong>Notion / Obsidian：</strong>Notion 免费版有限制，付费版 $8-20/月；Obsidian 本地免费但同步付费。</p>
+                <div class="tip">💡 零成本意味着可以无压力地在所有项目中使用，包括个人小项目。</div>
+            `},
+
+            // 实际效果
+            'metric-1': { icon: '📉', title: '目标漂移率 ↓70%', content: `
+                <p><strong>效果：</strong>使用目标栈管理后，AI 在长任务中的目标漂移率下降约 70%。</p>
+                <h3>原因分析</h3>
+                <ul>
+                    <li>AI 每次回复前都会对齐目标栈，检测偏差</li>
+                    <li>弱偏差 → 黄色提醒后执行</li>
+                    <li>强偏差 → 暂停并给出三个选项</li>
+                    <li>检查点机制每 3 步或 10 轮输出进度回顾</li>
+                </ul>
+                <div class="highlight"><strong>对比：</strong>没用记忆系统时，10 轮对话后 AI 基本忘了初始目标；使用后，50 轮对话仍能保持目标对齐。</div>
+            `},
+            'metric-2': { icon: '💬', title: '重复沟通 ↓60%', content: `
+                <p><strong>效果：</strong>跨会话重复沟通次数下降约 60%。</p>
+                <h3>原因分析</h3>
+                <ul>
+                    <li>决策记录持久化：之前定好的规则不会因为换会话而丢失</li>
+                    <li>经验教训预执行检查：踩过的坑不会重复踩</li>
+                    <li>主动更新机制：里程碑后自动记录，不用手动说"帮我记一下"</li>
+                </ul>
+                <div class="tip">💡 最直接的体感：以前每次开会话都要先说一遍项目背景和规则，现在 AI 自动从记忆中加载。</div>
+            `},
+            'metric-3': { icon: '🔄', title: '工具迁移成本 = 0', content: `
+                <p><strong>效果：</strong>在 TRAE、Cursor、Claude Code 等工具间切换时，记忆系统零成本迁移。</p>
+                <h3>原因</h3>
+                <ul>
+                    <li>所有记忆文件都是纯 Markdown，无格式锁定</li>
+                    <li>不依赖任何工具的专有机制</li>
+                    <li>复制文件夹到新工具目录即可使用</li>
+                    <li>agent.md + memory.md 是标准文件，任何支持本地文件的 AI 都能识别</li>
+                </ul>
+                <div class="highlight"><strong>实际验证：</strong>已在 3+ 种 AI 工具间迁移使用，记忆资产完整保留，零损失。</div>
+            `},
+            'metric-4': { icon: '📅', title: '3 个月实际使用验证', content: `
+                <p><strong>效果：</strong>系统已持续使用 3 个月，覆盖多个项目类型。</p>
+                <h3>验证场景</h3>
+                <ul>
+                    <li><strong>内容创作</strong>：公众号文章、视频脚本，跨会话保持风格一致</li>
+                    <li><strong>产品开发</strong>：Skill 开发、项目迭代，决策可追溯</li>
+                    <li><strong>知识管理</strong>：学习笔记、读书笔记，自动沉淀为语料库</li>
+                    <li><strong>面试准备</strong>：简历优化、面试复盘，经验持续积累</li>
+                </ul>
+                <div class="tip">💡 3 个月的使用中持续迭代了 3 个版本（v1→v2→v3），每个版本都解决了实际使用中发现的问题。</div>
+            `}
+        };
+        
+        function openModal(id) {
+            const data = modalData[id];
+            if (!data) return;
+            
+            document.getElementById('modal-icon').textContent = data.icon;
+            document.getElementById('modal-title').textContent = data.title;
+            document.getElementById('modal-content').innerHTML = data.content;
+            document.getElementById('modal-overlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+            document.getElementById('modal-overlay').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        // ESC 键关闭弹窗
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
