@@ -2,11 +2,11 @@
 name: "memory-system"
 description: "Generates a Knowledge OS-level white-box memory system with goal stack, attention drift protection, Source of Truth hierarchy, lifecycle governance, proactive auto-update, 3-level recall, and structured knowledge base. Invoke when user says '搭建记忆系统' / 'set up memory system', '创建记忆文件' / 'create memory file', or a project needs context anchoring. Supports both Chinese and English trigger phrases."
 globs: ["**/*.md"]
-version: 3.0.0
+version: 3.1.0
 author: "custom"
 ---
 
-# Reusable Layered Memory System Scaffold v3.0 (Knowledge OS)
+# Reusable Layered Memory System Scaffold v3.1 (Knowledge OS)
 
 > **Language**: English | [简体中文](./SKILL.zh-CN.md)
 
@@ -22,6 +22,9 @@ The memory system is the project's Knowledge OS (Knowledge Operating System). It
 - **Lifecycle management**: Memory has states (valid/pending/deprecated); it ages, conflicts, and merges
 - **Proactive evolution**: No need to wait for the user to say "update memory"; proactively propose consolidation after milestones
 - **Tiered loading**: Default L1 summary → L2 fragments when needed → L3 full text for depth, with controllable token budget
+- **Information denoising**: Filter noise before it enters memory — semantic/role/importance-based triage, not keyword matching
+- **Task relay**: Complex tasks decompose into sub-tasks with isolated context; results pass forward, not full history
+- **Active forgetting**: Time-decay and frequency-based forgetting; dormant entries don't bloat the active memory
 - **Storage serves recall**: Lets the AI know "when to read what, at what granularity, and who to obey when there are contradictions"
 
 ## Trigger Conditions
@@ -196,8 +199,32 @@ You are the AI assistant for [project name]. [One-line role positioning].
 4. **Cases not auto-recorded**: pure discussion/chitchat, user explicitly says "don't record", temporary information (e.g., "check the weather for me")
 5. **Update scope control**: Each auto-update only appends entries; it does not modify/delete existing entries (unless user explicitly requests); auto-updated content defaults to pending state
 
+## Information Denoising Rules (pre-memory filtering)
+1. **Before any information enters memory, it must pass a denoising filter:**
+   - Semantic check: Is this a fact/decision/lesson, or an emotional expression/repeated query/filler word?
+   - Role check: Is this from the user, AI inference, or external reference?
+   - Importance score: 1-5; anything below 3 is not written to memory
+   - Deduplication: Is it highly similar to an existing memory entry? If so, merge instead of append
+2. **Noise categories (auto-filtered, never written):**
+   - Repeated questions already answered in the current session
+   - Emotional expressions with no factual content ("that's annoying", "great")
+   - Filler phrases and verbal tics
+   - Temporary contextual info (e.g., "check the weather")
+3. **Do not use keyword matching for denoising** — keyword matching causes false positives (e.g., filtering "status" in "check my order status"). Use semantic understanding.
+
+## Task Relay Rules (complex task decomposition)
+1. **When a task is too complex for a single context window, decompose into sub-tasks:**
+   - Each sub-task gets its own context scope (only loads relevant memory files, not full history)
+   - Results are written to `memory/` as deliverables, not passed as raw conversation
+   - The next sub-task reads the deliverable, not the previous conversation
+2. **Task Relay Table** (maintained in `memory.md`):
+   - Tracks: sub-task name, responsible agent, context scope, status, deliverable, next handler
+   - Updated in real time as sub-tasks progress
+3. **Error isolation:** If a sub-task fails, only that sub-task rolls back; other sub-tasks are unaffected
+4. **Context handover format:** Deliverable summary + key constraints + files to load (not full conversation history)
+
 ## Global Rules
-1. At the start of each conversation, first read `memory.md` (L3 full text, because it is the index); based on task type, determine which files to load from the "Task type → recall preset" table
+1. At the start of each conversation, first read `memory.md`
 2. Loading follows the L1→L2→L3 three-level escalation rules (see "Three-level Loading Rules" in `memory.md`)
 3. On information conflict, strictly arbitrate according to the SoT authority hierarchy (see "Source of Truth Hierarchy" in `memory.md`)
 4. Storage serves recall: memory files should be concise and structured for quick positioning next time
@@ -376,6 +403,34 @@ See `context/README.md` for the corpus index. Memory files only retain the corpu
 ## Directory Structure Quick Reference
 
 [Filled by AI based on the actual file structure created]
+
+## Task Relay Table (for complex multi-step tasks)
+
+> When a task is too complex for a single context window, decompose into sub-tasks. Each sub-task has isolated context and passes deliverables forward.
+
+| Sub-task | Responsible Agent | Context Scope | Status | Deliverable | Next Handler |
+|----------|------------------|---------------|--------|-------------|-------------|
+| (none yet) | | | | | |
+
+**Relay rules:**
+- Status: pending / in-progress / completed / failed
+- Deliverable: file path in `memory/` (not raw conversation)
+- Next handler reads the deliverable file, not the previous conversation history
+- On failure, only the failed sub-task rolls back
+
+## Active Forgetting Rules
+
+> Memory that is never forgotten becomes noise. Active forgetting keeps the active memory lean.
+
+1. **Time decay**: Entries not referenced for 30 days → marked as `dormant` (excluded from recall, but kept in file)
+2. **Frequency decay**: `pending` entries with 0 references after 14 days → auto-transition to `deprecated`
+3. **Capacity threshold**: Single file exceeds 300 lines → trigger deep restructure (not just dedup, but reorganize structure)
+4. **Conflict elimination**: Low-SoT entries overridden by higher-SoT entries → auto-mark as `deprecated`
+5. **Dormant entries**:
+   - Not loaded during recall (skip in navigation map)
+   - Kept in file under a `## Dormant` section
+   - User can reactivate via "recall" command
+6. **Monthly forgetting report**: On the 1st of each month, AI outputs a summary of what was forgotten/dormant, with option to restore
 
 ## Memory Lifecycle Rules
 
@@ -879,6 +934,64 @@ This section is an execution reference for the AI and is not directly generated 
    - On task switch, previously loaded L2/L3 can be downgraded (no longer a key reference)
    - Under high context pressure, proactively downgrade low-priority files from L2 to L1
 
+### 6.7 Information Denoising Execution Flow
+
+1. **Before writing any information to memory, execute denoising filter:**
+   a. Semantic classification: Is this a fact, decision, lesson, constraint, or noise?
+   b. Role classification: User-stated / AI-inferred / external-reference
+   c. Importance scoring: 1-5 scale (1 = trivial, 5 = critical)
+   d. Deduplication: Scan target file TL;DR and headings for similarity
+2. **Filtering results:**
+   - Importance ≥ 3 and not duplicate → write to memory (pending state)
+   - Importance < 3 → discard silently
+   - Duplicate → merge with existing entry
+   - Emotional/filler/repeated → discard silently
+3. **Do NOT use keyword matching for denoising.** Use semantic understanding to avoid false positives (e.g., "status" in "check order status" is not noise)
+4. **Denoising log:** When discarding, briefly note what was filtered and why (in Checkpoint, not in memory files)
+
+### 6.8 Task Relay Execution Flow
+
+1. **Trigger:** When a task is assessed as too complex for a single context window (est. >50 conversation rounds or multi-domain)
+2. **Decomposition:**
+   a. Break the task into sub-tasks with clear boundaries
+   b. For each sub-task, define: context scope (which memory files to load), expected deliverable, and next handler
+   c. Write the decomposition to the Task Relay Table in `memory.md`
+3. **Execution:**
+   a. Each sub-task starts with a fresh context: load only its defined scope + previous deliverables
+   b. On completion, write the deliverable to `memory/` as a file (not as conversation)
+   c. Update the Task Relay Table: mark as completed, fill in deliverable path
+   d. Next sub-task reads the deliverable file, not the previous conversation
+4. **Error handling:**
+   - Sub-task fails → mark as failed in Relay Table, do not cascade to other sub-tasks
+   - User can retry the failed sub-task independently
+5. **Context handover format:** Deliverable summary + key constraints + list of memory files to load
+
+### 6.9 Active Forgetting Execution Flow
+
+1. **Trigger conditions (checked at session start and at Checkpoint):**
+   a. Time decay: Any entry not referenced in the last 30 days → mark as `dormant`
+   b. Frequency decay: `pending` entries with 0 references after 14 days → auto-transition to `deprecated`
+   c. Capacity: Any file exceeding 300 lines → trigger deep restructure
+   d. Conflict elimination: Lower-SoT entries overridden by higher-SoT → auto-deprecate the lower one
+2. **Dormant handling:**
+   - Move dormant entries to a `## Dormant` section at the end of the file
+   - Exclude from recall (skip in navigation map)
+   - Keep in file (do not delete)
+3. **Deep restructure (300+ lines):**
+   - Not just deduplication — reorganize the entire file structure
+   - Merge related sections, extract new TL;DRs, archive deprecated entries
+   - Target: reduce to ≤200 lines in the active area
+4. **Monthly forgetting report:**
+   - On the 1st of each month (or at first session of the month), AI outputs:
+     ```
+     [Forgetting Report]
+     - Dormant entries: [count] (list file + entry names)
+     - Auto-deprecated: [count] (list with reason)
+     - Deep restructured: [file names]
+     - To restore: say "recall [entry name]"
+     ```
+   - User can restore any dormant entry by saying "recall [entry name]"
+
 ## Memory System Iron Rules (Knowledge OS v3.0)
 
 1. **`memory.md` is the entry**: AI reads memory.md first at the start of every conversation (L3 full text)
@@ -896,6 +1009,9 @@ This section is an execution reference for the AI and is not directly generated 
 13. **AI auto-classifies**: User defines top-level framework; specific classification delegated to AI
 14. **No fabrication principle**: Information that cannot be detected is marked `[TBD]`; auto-recorded initial state is pending
 15. **White-box + anti-pollution**: Assets stored in user-controlled directories; pure MD, no binding; no cross-pollution
+16. **Denoise before store**: All information passes semantic/role/importance filter before entering memory; keyword matching is prohibited
+17. **Relay for complex tasks**: Tasks exceeding single-context capacity decompose into sub-tasks with isolated context and deliverable-based handover
+18. **Forget to stay lean**: Time-decay (30d dormant) and frequency-decay (14d deprecate) keep active memory lean; monthly forgetting report keeps user informed
 
 ## Anti-Pollution Rules
 
