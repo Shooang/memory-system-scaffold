@@ -232,7 +232,7 @@ This Skill is a generic scaffold and **contains no project-private information**
 - **Active Forgetting**: Time-decay (30d dormant) + frequency-decay (14d deprecate) + capacity threshold (300 lines) + conflict elimination
 - **Monthly Forgetting Report**: Auto-generated summary of dormant/deprecated entries with restore option
 - **Iron Rules Expanded**: 15 → 18 rules (denoise before store, relay for complex tasks, forget to stay lean)
-- **HTML Demo Page**: Interactive skill introduction with clickable cards and detail modals
+
 
 ### v3.0.0 — Knowledge OS Upgrade
 - **Goal Stack**: Four-layer goal decomposition and auto-alignment check
